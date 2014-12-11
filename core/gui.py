@@ -1,18 +1,11 @@
 from PyQt5.QtCore import *
 from PyQt5.QtWidgets import *
 from PyQt5.QtGui import *
-from PyQt5.QtWebKitWidgets import QWebView
 from PyQt5.QtQml import *
 from PyQt5.QtQuick import *
 import logging
 
-class CounterpartydAPI(QObject):
-    def __init__(self):
-        super(CounterpartydAPI, self).__init__()
-
-    @pyqtSlot(QVariant, result=QVariant)
-    def call(self, query):
-        return QVariant({"toto": query['command']})
+from core.api import CounterpartydAPI
 
 class GUI(QMainWindow):
 
@@ -36,9 +29,9 @@ class GUI(QMainWindow):
         self.stackedWidget = QStackedWidget()
         self.plugins = []
 
-        self.xcpApi = CounterpartydAPI() 
+        self.xcpApi = CounterpartydAPI(config) 
 
-        for pluginName in self.config.plugins:
+        for pluginName in self.config.PLUGINS:
             view = QQuickView();
             context = view.rootContext()
             context.setContextProperty("xcpApi", self.xcpApi)

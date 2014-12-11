@@ -23,13 +23,11 @@ Rectangle {
 
     function onMenuAction(itemValue) {
         var query = {
-            'command': 'get_balances',
-            'params': {
-                'addresses':['address1', 'address2']
-            }
+            'method': 'get_running_info',
+            'params': {}
         }
         var result = xcpApi.call(query)
-        balance.text = "clicked: " + itemValue + ' ' + result["toto"];
+        balance.text = "clicked: " + itemValue + ' ' + result["bitcoin_block_count"];
     }
 
     RowLayout {
