@@ -1,7 +1,7 @@
 from PyQt5.QtWidgets import QApplication
 
-from lib.gui import GUI
-from lib.config import Config
+from core.gui import GUI
+from core.config import Config
 
 if __name__ == '__main__':
     import sys
@@ -10,6 +10,5 @@ if __name__ == '__main__':
 
     config = Config()
     screen = GUI(config)
-
     
     sys.exit(app.exec_())
