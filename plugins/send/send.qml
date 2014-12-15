@@ -17,8 +17,12 @@ Rectangle {
             'items': []
         }
         for (var asset in balances) {
-            var amount = Math.round(Number(balances[asset]) * 100) / 100;
-            var label = asset + ' (' + amount + ')';
+            var assetName = String(asset)
+            if (assetName.substring(0,1) === "A") {
+                assetName = assetName.substring(0,4) + '...' + assetName.substring(assetName.length - 4)
+            }
+            var amount = Number(balances[asset]).toFixed(2)
+            var label = assetName + ' (' + amount + ')';
             menu['items'].push({'label': label, 'value': asset})
         }
         root.menu = menu

@@ -7,6 +7,27 @@ import logging
 
 from core.api import CounterpartydAPI
 
+class MenuItem(QLabel):
+    def __init__(self, text, parent=None):
+        QLabel.__init__(self, parent)
+        self.parent = parent
+        self.setText(text)
+
+    def mouseReleaseEvent(self, event):
+        pluginIndex = self.property('pluginIndex')
+        actionValue = self.property('actionValue')
+        # display the plugin
+        self.parent.stackedWidget.setCurrentIndex(pluginIndex)
+        # call the plugin callback
+        self.parent.plugins[pluginIndex].onMenuAction(actionValue)
+        # change style
+        if self.parent.currentMenuItem:
+            self.parent.currentMenuItem.setProperty('active', 'false')
+        self.setProperty('active', 'true')
+        self.parent.currentMenuItem = self
+        self.parent.refreshStyleSheet()
+
+
 class GUI(QMainWindow):
 
     def __init__(self, config):
@@ -15,16 +36,17 @@ class GUI(QMainWindow):
         self.config = config
 
         self.resize(800, 600)
-        self.setWindowTitle("Counterparty Wallet")
+        self.setWindowTitle("Counterparty GUI")
 
         # init toolbar
         toolbar = QToolBar()
+        toolbar.setAutoFillBackground(True);
+        toolbar.setObjectName('menu')
         toolbar.setMovable(False)
         toolbar.setFloatable(False)
         toolbar.setToolButtonStyle(Qt.ToolButtonTextBesideIcon|Qt.AlignLeft)
         self.addToolBar(Qt.LeftToolBarArea, toolbar)
-        actionGroup = QActionGroup(self)
-        actionGroup.setExclusive(True)
+        self.currentMenuItem = None
 
         # init QML plugin container
         self.stackedWidget = QStackedWidget()
@@ -32,7 +54,7 @@ class GUI(QMainWindow):
 
         # init xcpApi
         self.xcpApi = CounterpartydAPI(config) 
-
+        actionIndex = 0
         for pluginName in self.config.PLUGINS:
             view = QQuickView();
             # add xcpApi into the plugin context
@@ -55,38 +77,34 @@ class GUI(QMainWindow):
                 # menu title
                 if 'groupLabel' in menu:
                     menuGroupLabel = QLabel(menu['groupLabel'])
+                    menuGroupLabel.setProperty('isGroupLabel', 'true')
                     toolbar.addWidget(menuGroupLabel)
                 # menu item
                 for menuItem in menu['items']:
                     if isinstance(menuItem, dict) and 'label' in menuItem  and 'value' in menuItem:
-                        actionIndex = len(actionGroup.actions())
-                        action = QAction(menuItem['label'], actionGroup)
-                        action.setProperty('pluginIndex', pluginIndex)
-                        action.setProperty('actionValue', menuItem['value'])
-                        action.setCheckable(True)
-                        toolbar.addAction(action)
-                # menu separator
-                if 'groupLabel' in menu:
-                    toolbar.addSeparator()
+                        item = MenuItem(menuItem['label'], self)
+                        item.setProperty('pluginIndex', pluginIndex)
+                        item.setProperty('actionValue', menuItem['value'])
+                        item.setProperty('isAction', 'true') 
+                        toolbar.addWidget(item)
 
             # add the plugin in the container
             container = QWidget.createWindowContainer(view, self);
             self.stackedWidget.addWidget(container)
 
-        # connect menu action to the plugin callback
-        actionGroup.triggered.connect(self.onMenuAction)
-
         # display the plugin container
+        self.refreshStyleSheet()
         self.setCentralWidget(self.stackedWidget)
         self.show()
 
-    def onMenuAction(self, action):
-        pluginIndex = action.property('pluginIndex')
-        actionValue = action.property('actionValue')
-        # display the plugin
-        self.stackedWidget.setCurrentIndex(pluginIndex)
-        # call the plugin callback
-        self.plugins[pluginIndex].onMenuAction(actionValue)
-           
+    def refreshStyleSheet(self):
+        self.setStyleSheet('''
+            QToolBar#menu { background-color: #ececec; border: 1px solid #ececec; }
+            QToolBar#menu QLabel { width:100%; text-align:left; padding:3px; margin:0; }
+            QToolBar#menu QLabel[isAction="true"]:hover { background-color:#CCC; }
+            QToolBar#menu QLabel[active="true"] { background-color:#CCC; }
+            QToolBar#menu QLabel[isAction="true"] { padding-left: 15px; }
+            QToolBar#menu QLabel[isGroupLabel="true"] { color:#888888; text-transform:uppercase; }
+        ''')
 
    
