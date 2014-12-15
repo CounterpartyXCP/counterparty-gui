@@ -11,23 +11,21 @@ Rectangle {
     property variant menu
 
     function init() {
-        root.menu = {
+        var balances = xcpApi.getBalances()
+        var menu = {
             'groupLabel': 'Wallet',
-            'items': [
-                { 'label': 'BTC (3.02)', 'value': 'BTC' },
-                { 'label': 'XCP (3.02)', 'value': 'XCP' },
-                { 'label': 'GOLD (3.02)', 'value': 'GOLD' }
-            ]
+            'items': []
         }
+        for (var asset in balances) {
+            var amount = Math.round(Number(balances[asset]) * 100) / 100;
+            var label = asset + ' (' + amount + ')';
+            menu['items'].push({'label': label, 'value': asset})
+        }
+        root.menu = menu
     }
 
     function onMenuAction(itemValue) {
-        var query = {
-            'method': 'get_running_info',
-            'params': {}
-        }
-        var result = xcpApi.call(query)
-        balance.text = "clicked: " + itemValue + ' ' + result["bitcoin_block_count"];
+
     }
 
     RowLayout {

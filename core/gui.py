@@ -21,7 +21,7 @@ class GUI(QMainWindow):
         toolbar = QToolBar()
         toolbar.setMovable(False)
         toolbar.setFloatable(False)
-        toolbar.setToolButtonStyle(Qt.ToolButtonTextBesideIcon|Qt.AlignLeading)
+        toolbar.setToolButtonStyle(Qt.ToolButtonTextBesideIcon|Qt.AlignLeft)
         self.addToolBar(Qt.LeftToolBarArea, toolbar)
         actionGroup = QActionGroup(self)
         actionGroup.setExclusive(True)
@@ -38,6 +38,7 @@ class GUI(QMainWindow):
             # add xcpApi into the plugin context
             context = view.rootContext()
             context.setContextProperty("xcpApi", self.xcpApi)
+            context.setContextProperty("logging", logging)
             # load QML file
             view.setSource(QUrl('plugins/{}/{}.qml'.format(pluginName, pluginName)));            
             
