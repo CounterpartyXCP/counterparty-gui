@@ -61,6 +61,11 @@ class CounterpartydAPI(QObject):
 
     @pyqtSlot(QVariant, result=QVariant)
     def call(self, query):
+        # TODO: hack, find a real solution
+        for key in query['params']:
+            if key in ['quantity']:
+                query['params'][key] = int(query['params'][key])
+                
         result = self.query(query['method'], query['params'])
         return QVariant(result)
 

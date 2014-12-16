@@ -34,10 +34,12 @@ Rectangle {
     }
 
     function onMenuAction(itemValue) {
-        var assetInfo = xcpApi.getAssetInfo(itemValue);
+        root.currentAsset = itemValue;
 
-        balance.text = '<b>' + itemValue + '</b><br />' + assetInfo['balance'];
-        sendButton.text = 'Send ' + itemValue;
+        var assetInfo = xcpApi.getAssetInfo(root.currentAsset);
+
+        balance.text = '<b>' + root.currentAsset + '</b><br />' + assetInfo['balance'];
+        sendButton.text = 'Send ' + root.currentAsset;
 
         var sources = [];
         for (var address in assetInfo['addresses']) {
@@ -138,8 +140,18 @@ Rectangle {
                     id: sendButton
                     text: "Send"
                     onClicked: {
-                        var source = sourceList.currentText.split(" ").shift();
-                        console.log("clicked: " + source);
+                        var query = {
+                            'method': 'do_send',
+                            'params': {
+                                'source': sourceList.currentText.split(" ").shift(),
+                                'destination': txTo.text,
+                                'asset': root.currentAsset,
+                                'quantity': parseInt((parseFloat(txValue.text) * 100000000).toFixed(0))
+                            }
+                        }
+                        xcpApi.log(query);
+                        var result = xcpApi.call(query);
+                        xcpApi.log(result);
                     }
                 }
             }
