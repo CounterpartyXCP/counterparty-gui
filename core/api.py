@@ -85,9 +85,45 @@ class CounterpartydAPI(QObject):
 
         return QVariant(balanceByAsset)
 
+    @pyqtSlot(QVariant, result=QVariant)
+    def getAssetInfo(self, asset):
+        btcWallet = self.query('get_wallet', {})
+        addresses = []
+
+        btcBalance = D(0)
+        for address in btcWallet:
+            addresses.append(address)
+            btcBalance += D(btcWallet[address])
+
+        if asset == 'BTC':
+            return QVariant({
+                'balance': format(btcBalance, '.8f'),
+                'addresses': btcWallet
+            })
+
+        else:
+            balances = self.query('get_balances', {'filters': [('address', 'IN', addresses), ('asset', '==', asset)]})
+
+            assetBalance = D(0)
+            assetWallet = {}
+            for balance in balances:
+                quantity = D(balance['quantity']) / UNIT
+                assetBalance += quantity
+                assetWallet[balance['address']] = format(quantity, '.8f')
+
+            result = {
+                'balance': format(assetBalance, '.8f'),
+                'addresses': assetWallet
+            }
+
+            logging.error(result)
+
+            return QVariant(result)
+
+
     @pyqtSlot(QVariant)
     def log(self, message):
-        logging.info("FROM QML:")
-        logging.info(message)
+        logging.error("FROM QML:")
+        logging.error(message)
 
 

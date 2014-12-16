@@ -13,7 +13,7 @@ class MenuItem(QLabel):
         self.parent = parent
         self.setText(text)
 
-    def mouseReleaseEvent(self, event):
+    def activate(self):
         pluginIndex = self.property('pluginIndex')
         actionValue = self.property('actionValue')
         # display the plugin
@@ -27,6 +27,9 @@ class MenuItem(QLabel):
         self.parent.currentMenuItem = self
         self.parent.refreshStyleSheet()
 
+    def mouseReleaseEvent(self, event):
+        self.activate()
+
 
 class GUI(QMainWindow):
 
@@ -35,7 +38,7 @@ class GUI(QMainWindow):
 
         self.config = config
 
-        self.resize(800, 600)
+        self.resize(1024, 680)
         self.setWindowTitle("Counterparty GUI")
 
         # init toolbar
@@ -80,16 +83,20 @@ class GUI(QMainWindow):
                     menuGroupLabel.setProperty('isGroupLabel', 'true')
                     toolbar.addWidget(menuGroupLabel)
                 # menu item
+                items = []
                 for menuItem in menu['items']:
                     if isinstance(menuItem, dict) and 'label' in menuItem  and 'value' in menuItem:
-                        item = MenuItem(menuItem['label'], self)
-                        item.setProperty('pluginIndex', pluginIndex)
-                        item.setProperty('actionValue', menuItem['value'])
-                        item.setProperty('isAction', 'true') 
-                        toolbar.addWidget(item)
+                        items.append(MenuItem(menuItem['label'], self))
+                        items[-1].setProperty('pluginIndex', pluginIndex)
+                        items[-1].setProperty('actionValue', menuItem['value'])
+                        items[-1].setProperty('isAction', 'true') 
+                        toolbar.addWidget(items[-1])
+                        if self.currentMenuItem is None:
+                            self.currentMenuItem = items[-1]
 
             # add the plugin in the container
-            container = QWidget.createWindowContainer(view, self);
+            container = QWidget.createWindowContainer(view, self)
+            self.currentMenuItem.activate()
             self.stackedWidget.addWidget(container)
 
         # display the plugin container
@@ -99,7 +106,7 @@ class GUI(QMainWindow):
 
     def refreshStyleSheet(self):
         self.setStyleSheet('''
-            QToolBar#menu { background-color: #ececec; border: 1px solid #ececec; }
+            QToolBar#menu { background-color: #ececec; border: 1px solid #ececec; border-right-color: #000; }
             QToolBar#menu QLabel { width:100%; text-align:left; padding:3px; margin:0; }
             QToolBar#menu QLabel[isAction="true"]:hover { background-color:#CCC; }
             QToolBar#menu QLabel[active="true"] { background-color:#CCC; }
