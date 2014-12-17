@@ -1,4 +1,5 @@
 from PyQt5.QtCore import QObject, QVariant, pyqtSlot
+from PyQt5.QtWidgets import QMessageBox, QWidget
 import logging
 import requests
 import sys
@@ -16,7 +17,10 @@ class DecimalEncoder(json.JSONEncoder):
 
 # TODO: display message box
 class CounterpartydRPCError(Exception):
-    pass
+    def __init__(self, message):
+        super().__init__(message)
+        QMessageBox.information(QWidget(), "RPC Error", message)
+        raise Exception(message)
 
 class CounterpartydAPI(QObject):
     def __init__(self, config):
@@ -62,10 +66,13 @@ class CounterpartydAPI(QObject):
     @pyqtSlot(QVariant, result=QVariant)
     def call(self, query):
         # TODO: hack, find a real solution
-        for key in query['params']:
-            if key in ['quantity']:
-                query['params'][key] = int(query['params'][key])
-                
+        try:
+            for key in query['params']:
+                if key in ['quantity']:
+                    query['params'][key] = int(query['params'][key])
+        except:
+            pass
+
         result = self.query(query['method'], query['params'])
         return QVariant(result)
 

@@ -67,7 +67,9 @@ Rectangle {
 
         if (GUI.confirm("Confirm send", confirmMessage)) {
             var result = xcpApi.call(query);
-            GUI.alert("Transaction done", result);
+            if (result) {
+                GUI.alert("Transaction done", result);
+            }
         }
 
     }
