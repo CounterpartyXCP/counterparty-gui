@@ -1,7 +1,7 @@
-import QtQuick 2.0
+import QtQuick 2.3
 import QtQuick.Controls 1.0;
 import QtQuick.Layouts 1.0;
-import QtQuick.Dialogs 1.0;
+import QtQuick.Dialogs 1.1;
 import QtQuick.Window 2.1;
 import QtQuick.Controls.Styles 1.1
 
@@ -49,6 +49,29 @@ Rectangle {
         }
         sourceList.model = sources;
     }
+
+    function sendAsset() {
+        var query = {
+            'method': 'do_send',
+            'params': {
+                'source': sourceList.currentText.split(" ").shift(),
+                'destination': txTo.text,
+                'asset': root.currentAsset,
+                'quantity': parseInt((parseFloat(txValue.text) * 100000000).toFixed(0))
+            }
+        }
+
+        var confirmMessage = "Do you really want to send " +
+                             txValue.text + " " + root.currentAsset +
+                             " to " + txTo.text;
+
+        if (GUI.confirm("Confirm send", confirmMessage)) {
+            var result = xcpApi.call(query);
+            GUI.alert("Transaction done", result);
+        }
+
+    }
+
 
     ColumnLayout {
         id: mainLayout
@@ -107,6 +130,7 @@ Rectangle {
 
                 TextField {
                     id: txTo
+                    activeFocusOnPress: true
                     style: TextFieldStyle {
                         background: Rectangle {
                             implicitWidth: 200
@@ -121,7 +145,6 @@ Rectangle {
                     text: "Amount"
                 }
 
-                // There's something off with the row layout where textfields won't listen to the width setting
                 TextField {
                     id: txValue
                     style: TextFieldStyle {
@@ -140,26 +163,10 @@ Rectangle {
                     id: sendButton
                     text: "Send"
                     onClicked: {
-                        var query = {
-                            'method': 'do_send',
-                            'params': {
-                                'source': sourceList.currentText.split(" ").shift(),
-                                'destination': txTo.text,
-                                'asset': root.currentAsset,
-                                'quantity': parseInt((parseFloat(txValue.text) * 100000000).toFixed(0))
-                            }
-                        }
-                        xcpApi.log(query);
-                        var result = xcpApi.call(query);
-                        xcpApi.log(result);
+                        sendAsset();
                     }
                 }
             }
-
-
         }
     }
-
-
-
 }

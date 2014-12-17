@@ -30,7 +30,6 @@ class MenuItem(QLabel):
     def mouseReleaseEvent(self, event):
         self.activate()
 
-
 class GUI(QMainWindow):
 
     def __init__(self, config):
@@ -63,7 +62,7 @@ class GUI(QMainWindow):
             # add xcpApi into the plugin context
             context = view.rootContext()
             context.setContextProperty("xcpApi", self.xcpApi)
-            context.setContextProperty("logging", logging)
+            context.setContextProperty("GUI", self)
             # load QML file
             view.setSource(QUrl('plugins/{}/{}.qml'.format(pluginName, pluginName)));            
             
@@ -114,4 +113,16 @@ class GUI(QMainWindow):
             QToolBar#menu QLabel[isGroupLabel="true"] { color:#888888; text-transform:uppercase; }
         ''')
 
+    @pyqtSlot(QVariant, QVariant, result=QVariant)
+    def confirm(self, title, text):
+        result = QMessageBox.question(self, title, text)
+        if result == QMessageBox.Yes:
+            return True
+        else:
+            return False
+
+    @pyqtSlot(QVariant, QVariant)
+    def alert(self, title, text):
+        QMessageBox.information(self, title, text)
+        
    
