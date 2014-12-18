@@ -51,7 +51,8 @@ class GUI(QMainWindow):
         self.currentMenuItem = None
 
         # init QML plugin container
-        self.stackedWidget = QStackedWidget()
+        self.stackedWidget = QStackedWidget(self)
+        self.stackedWidget.setWindowFlags(Qt.BypassWindowManagerHint)
         self.plugins = []
 
         # init xcpApi
@@ -63,7 +64,9 @@ class GUI(QMainWindow):
             context = view.rootContext()
             context.setContextProperty("xcpApi", self.xcpApi)
             context.setContextProperty("GUI", self)
+
             # load QML file
+            
             view.setSource(QUrl('plugins/{}/{}.qml'.format(pluginName, pluginName)));            
             
             plugin = view.rootObject()

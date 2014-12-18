@@ -19,7 +19,7 @@ class DecimalEncoder(json.JSONEncoder):
 class CounterpartydRPCError(Exception):
     def __init__(self, message):
         super().__init__(message)
-        QMessageBox.information(QWidget(), "RPC Error", message)
+        QMessageBox.critical(QWidget(), "RPC Error", message)
         raise Exception(message)
 
 class CounterpartydAPI(QObject):
@@ -61,7 +61,7 @@ class CounterpartydAPI(QObject):
         if 'error' not in responseJson.keys() or responseJson['error'] == None:
             return responseJson['result']
         else:
-            raise CounterpartydRPCError('{}'.format(responseJson['error']))
+            raise CounterpartydRPCError('{}'.format(responseJson['error']['data']['message']))
 
     @pyqtSlot(QVariant, result=QVariant)
     def call(self, query):
@@ -101,6 +101,7 @@ class CounterpartydAPI(QObject):
     def getAssetInfo(self, asset):
         btcWallet = self.query('get_wallet', {})
         addresses = []
+        result = {}
 
         btcBalance = D(0)
         for address in btcWallet:
@@ -108,10 +109,8 @@ class CounterpartydAPI(QObject):
             btcBalance += D(btcWallet[address])
 
         if asset == 'BTC':
-            return QVariant({
-                'balance': format(btcBalance, '.8f'),
-                'addresses': btcWallet
-            })
+            result['balance'] = format(btcBalance, '.8f')
+            result['addresses'] = btcWallet
 
         else:
             balances = self.query('get_balances', {'filters': [('address', 'IN', addresses), ('asset', '==', asset)]})
@@ -123,14 +122,25 @@ class CounterpartydAPI(QObject):
                 assetBalance += quantity
                 assetWallet[balance['address']] = format(quantity, '.8f')
 
-            result = {
-                'balance': format(assetBalance, '.8f'),
-                'addresses': assetWallet
-            }
+            result['balance'] = format(assetBalance, '.8f')
+            result['addresses'] = assetWallet
 
-            logging.error(result)
+        allSends = self.query('get_sends',  {'filters': [('source', 'IN', addresses), ('destination', 'IN', addresses)], 'filterop': 'OR', 'status': 'valid'})
+        sends = []
+        for send in allSends:
+            if send['asset'] == asset:
+                if send['source'] in addresses and send['destination'] in addresses:
+                    txType = 'swap'
+                elif send['source'] in addresses:
+                    txType = 'send'
+                elif send['destination'] in addresses:
+                    txType = 'receive'
+                send['type'] = txType
+                send['quantity'] = format(D(send['quantity']) / UNIT, '.8f')
+                sends.append(send)
+        result['sends'] = sends
 
-            return QVariant(result)
+        return QVariant(result)
 
 
     @pyqtSlot(QVariant)
