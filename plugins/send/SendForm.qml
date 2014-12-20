@@ -5,7 +5,7 @@ import QtQuick.Dialogs 1.1;
 import QtQuick.Window 2.1;
 import QtQuick.Controls.Styles 1.1
 
-Rectangle {
+GroupBox {
     id: sendPane
     property alias buttonText: sendButton.text
     property alias sources: sourceList.model
@@ -13,13 +13,9 @@ Rectangle {
     property alias destination: txTo.text
     property alias quantity: txValue.text
 
-    color: "#ececec"
-    border.color: "#cccccc"
-    border.width: 1
     height: sendForm.height + 20
     anchors {
-        top: balance.bottom
-        topMargin: 10
+        topMargin: 5
         left: parent.left
         leftMargin: 5
         right: parent.right
@@ -31,7 +27,6 @@ Rectangle {
         columns: 2
         anchors {
             top: parent.top
-            topMargin: 10
             horizontalCenter: parent.horizontalCenter
         }
 

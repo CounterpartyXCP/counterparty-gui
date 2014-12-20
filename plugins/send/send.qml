@@ -92,24 +92,32 @@ Rectangle {
         spacing: 10
         anchors.fill: root
 
-        Text {
-            id: balance
-            font.pixelSize: 30
+        Rectangle {
+            id: header
             anchors.left: parent.left
+            anchors.right: parent.right
             anchors.top: parent.top
-            anchors.leftMargin: 10
-            anchors.topMargin: 10
+            color: "#ececec"
+            height: (balance.height * 2) + 20
+
+            Text {
+                id: balance
+                font.pixelSize: 30
+                anchors.left: parent.left
+                anchors.top: parent.top
+                anchors.leftMargin: 10
+                anchors.topMargin: 10
+            }
         }
 
         SendForm {
             id:sendFormComp
+            anchors.top: header.bottom
         }
 
         SendsList {
             id: sendsListComp
-            anchors {
-                top: sendFormComp.bottom
-            }
+            anchors.top: sendFormComp.bottom
         }
     }
 
