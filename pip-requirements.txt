@@ -1,0 +1,5 @@
+#counterpartygui dependencies (installed via pip)
+
+appdirs==1.4.0
+
+requests==2.5.0
