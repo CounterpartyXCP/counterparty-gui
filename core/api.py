@@ -36,7 +36,7 @@ class CounterpartydAPI(QObject):
             "jsonrpc": "2.0",
             "id": 0,
         }
-        logging.error(payload)
+
         TRIES = 12
         for i in range(TRIES):
             try:
@@ -148,7 +148,7 @@ class CounterpartydAPI(QObject):
 
         return QVariant(result)
 
-
+    # TODO: temp
     @pyqtSlot(QVariant)
     def log(self, message):
         logging.error("FROM QML:")

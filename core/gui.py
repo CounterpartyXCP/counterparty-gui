@@ -30,14 +30,6 @@ class MenuItem(QLabel):
     def mouseReleaseEvent(self, event):
         self.activate()
 
-class PluginContainer(QMainWindow):
-    def __init__(self, parent=None):
-        QMainWindow.__init__(self, parent)
-
-    def requestActivate(self):
-        logging.error("requestActivate()!")
-
-
 class GUI(QMainWindow):
 
     def __init__(self, config):
