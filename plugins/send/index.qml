@@ -40,7 +40,7 @@ Rectangle {
 
         var assetInfo = xcpApi.getAssetInfo(root.currentAsset);
 
-        balance.text = '<b>' + root.currentAsset + '</b><br />' + assetInfo['balance'];
+        assetBalanceComp.text = '<b>' + root.currentAsset + '</b><br />' + assetInfo['balance'];
         sendFormComp.buttonText = 'Send ' + root.currentAsset;
 
         var sources = [];
@@ -92,27 +92,13 @@ Rectangle {
         spacing: 10
         anchors.fill: root
 
-        Rectangle {
-            id: header
-            anchors.left: parent.left
-            anchors.right: parent.right
-            anchors.top: parent.top
-            color: "#ececec"
-            height: (balance.height * 2) + 20
-
-            Text {
-                id: balance
-                font.pixelSize: 30
-                anchors.left: parent.left
-                anchors.top: parent.top
-                anchors.leftMargin: 10
-                anchors.topMargin: 10
-            }
+        AssetBalance {
+            id: assetBalanceComp
         }
 
         SendForm {
             id:sendFormComp
-            anchors.top: header.bottom
+            anchors.top: assetBalanceComp.bottom
         }
 
         SendsList {

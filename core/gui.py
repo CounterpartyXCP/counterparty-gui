@@ -75,7 +75,7 @@ class GUI(QMainWindow):
             context.setContextProperty("GUI", self)
 
             # load QML file
-            view.setSource(QUrl('plugins/{}/{}.qml'.format(pluginName, pluginName)));            
+            view.setSource(QUrl('plugins/{}/index.qml'.format(pluginName, pluginName)));            
             
             plugin = view.rootObject()
             pluginIndex = len(self.plugins)
