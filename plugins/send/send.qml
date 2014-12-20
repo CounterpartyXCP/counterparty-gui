@@ -10,6 +10,7 @@ Rectangle {
     anchors.fill: parent
     property variant menu
     property variant currentAsset
+    focus: true
 
     function init() {
         var balances = xcpApi.getBalances()
@@ -52,7 +53,6 @@ Rectangle {
 
         for (var t in assetInfo['sends']) {
             var tx = assetInfo['sends'][t]
-            xcpApi.log(tx)
             txModel.append({
                 type: tx['type'],
                 value: tx['quantity'],
@@ -227,4 +227,5 @@ Rectangle {
             }
         }
     }
+
 }

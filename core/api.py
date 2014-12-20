@@ -61,7 +61,13 @@ class CounterpartydAPI(QObject):
         if 'error' not in responseJson.keys() or responseJson['error'] == None:
             return responseJson['result']
         else:
-            raise CounterpartydRPCError('{}'.format(responseJson['error']['data']['message']))
+            if 'data' in responseJson['error'] and 'message' in responseJson['error']['data']:
+                message = responseJson['error']['data']['message']
+            elif 'message' in responseJson['error']:
+                message = responseJson['error']['message']
+            else:
+                message = responseJson['error']
+            raise CounterpartydRPCError('{}'.format(message))
 
     @pyqtSlot(QVariant, result=QVariant)
     def call(self, query):

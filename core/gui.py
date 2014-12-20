@@ -30,6 +30,14 @@ class MenuItem(QLabel):
     def mouseReleaseEvent(self, event):
         self.activate()
 
+class PluginContainer(QMainWindow):
+    def __init__(self, parent=None):
+        QMainWindow.__init__(self, parent)
+
+    def requestActivate(self):
+        logging.error("requestActivate()!")
+
+
 class GUI(QMainWindow):
 
     def __init__(self, config):
@@ -52,7 +60,6 @@ class GUI(QMainWindow):
 
         # init QML plugin container
         self.stackedWidget = QStackedWidget(self)
-        self.stackedWidget.setWindowFlags(Qt.BypassWindowManagerHint)
         self.plugins = []
 
         # init xcpApi
@@ -60,13 +67,14 @@ class GUI(QMainWindow):
         actionIndex = 0
         for pluginName in self.config.PLUGINS:
             view = QQuickView();
+            view.setFlags(Qt.SubWindow)
+
             # add xcpApi into the plugin context
             context = view.rootContext()
             context.setContextProperty("xcpApi", self.xcpApi)
             context.setContextProperty("GUI", self)
 
             # load QML file
-            
             view.setSource(QUrl('plugins/{}/{}.qml'.format(pluginName, pluginName)));            
             
             plugin = view.rootObject()
@@ -98,12 +106,13 @@ class GUI(QMainWindow):
 
             # add the plugin in the container
             container = QWidget.createWindowContainer(view, self)
-            self.currentMenuItem.activate()
             self.stackedWidget.addWidget(container)
 
         # display the plugin container
+        self.currentMenuItem.activate()
         self.refreshStyleSheet()
         self.setCentralWidget(self.stackedWidget)
+        
         self.show()
 
     def refreshStyleSheet(self):
