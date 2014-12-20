@@ -35,13 +35,13 @@ Rectangle {
     }
 
     function onMenuAction(itemValue) {
-        txModel.clear()
+        sendsListComp.listModel.clear()
         root.currentAsset = itemValue;
 
         var assetInfo = xcpApi.getAssetInfo(root.currentAsset);
 
         balance.text = '<b>' + root.currentAsset + '</b><br />' + assetInfo['balance'];
-        sendButton.text = 'Send ' + root.currentAsset;
+        sendFormComp.buttonText = 'Send ' + root.currentAsset;
 
         var sources = [];
         for (var address in assetInfo['addresses']) {
@@ -49,11 +49,11 @@ Rectangle {
             label += ' [' + assetInfo['addresses'][address] + ']';
             sources.push(label);
         }
-        sourceList.model = sources;
+        sendFormComp.sources = sources;
 
         for (var t in assetInfo['sends']) {
             var tx = assetInfo['sends'][t]
-            txModel.append({
+            sendsListComp.listModel.append({
                 type: tx['type'],
                 value: tx['quantity'],
                 from: tx['source'],
@@ -67,16 +67,16 @@ Rectangle {
         var query = {
             'method': 'do_send',
             'params': {
-                'source': sourceList.currentText.split(" ").shift(),
-                'destination': txTo.text,
+                'source':  sendFormComp.source.split(" ").shift(),
+                'destination': sendFormComp.destination,
                 'asset': root.currentAsset,
-                'quantity': parseInt((parseFloat(txValue.text) * 100000000).toFixed(0))
+                'quantity': parseInt((parseFloat(sendFormComp.quantity) * 100000000).toFixed(0))
             }
         }
 
         var confirmMessage = "Do you really want to send " +
-                             txValue.text + " " + root.currentAsset +
-                             " to " + txTo.text;
+                             sendFormComp.quantity + " " + root.currentAsset +
+                             " to " + sendFormComp.destination;
 
         if (GUI.confirm("Confirm send", confirmMessage)) {
             var result = xcpApi.call(query);
@@ -101,129 +101,14 @@ Rectangle {
             anchors.topMargin: 10
         }
 
-        Rectangle {
-            id: sendPane
-            color: "#ececec"
-            border.color: "#cccccc"
-            border.width: 1
-            height: sendForm.height + 20
-            anchors {
-                top: balance.bottom
-                topMargin: 10
-                left: parent.left
-                leftMargin: 5
-                right: parent.right
-                rightMargin: 5
-            }
-
-            GridLayout {
-                id: sendForm
-                columns: 2
-                anchors {
-                    top: parent.top
-                    topMargin: 10
-                    horizontalCenter: parent.horizontalCenter
-                }
-
-                Text {
-                    id: sourceListLabel
-                    text: "Source"
-                }
-
-                ComboBox {
-                    id: sourceList
-                    anchors.right: parent.right
-                    anchors.left: sourceListLabel.right
-                    anchors.leftMargin: 10
-                }
-
-                Text {
-                    text: "To"
-                }
-
-                TextField {
-                    id: txTo
-                    activeFocusOnPress: true
-                    focus: true
-                    style: TextFieldStyle {
-                        background: Rectangle {
-                            implicitWidth: 200
-                            border.color: "#cccccc"
-                            border.width: 1
-                        }
-                    }
-                    placeholderText: "Address"
-                    enabled: true
-                }
-
-                Text {
-                    text: "Amount"
-                }
-
-                TextField {
-                    id: txValue
-                    style: TextFieldStyle {
-                        background: Rectangle {
-                            implicitWidth: 100
-                            border.color: "#cccccc"
-                            border.width: 1
-                        }
-                    }
-                    placeholderText: "0.00"
-                }
-
-                Button {
-                    Layout.columnSpan: 2
-                    anchors.horizontalCenter: parent.horizontalCenter
-                    id: sendButton
-                    text: "Send"
-                    onClicked: {
-                        sendAsset();
-                    }
-                }
-            }
+        SendForm {
+            id:sendFormComp
         }
 
-        Rectangle {
+        SendsList {
+            id: sendsListComp
             anchors {
-                left: parent.left
-                right: parent.right
-                top: sendPane.bottom
-                topMargin: 10
-                bottom: parent.bottom
-            }
-
-            Component {
-                id: alignRightCell
-                Text {
-                    width: parent.width
-                    anchors.right: parent.right
-                    text: styleData.value
-                    horizontalAlignment: Text.AlignRight
-                    verticalAlignment: Text.AlignVCenter
-                    font.pixelSize: 10
-                    color: styleData.textColor
-                    elide: styleData.elideMode
-                    font.bold: true
-                }
-            }
-
-
-            TableView {
-                id: txTableView
-                anchors.fill : parent
-                TableViewColumn{ role: "type" ; title: "type" ; width: 50 }
-                TableViewColumn{ role: "value" ; title: "Amount" ; width: 100 ; delegate: alignRightCell }
-                TableViewColumn{ role: "from" ; title: "From" ; width: 280 }
-                TableViewColumn{ role: "to" ; title: "To" ; width: 280 }
-                TableViewColumn{ role: "block_index" ; title: "Block #" ; width: 100 ; delegate: alignRightCell }
-
-                model: ListModel {
-                    id: txModel
-                    Component.onCompleted: {
-                    }
-                }
-
+                top: sendFormComp.bottom
             }
         }
     }
