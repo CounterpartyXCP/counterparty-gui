@@ -37,7 +37,7 @@ For a summary of the command‐line arguments and options, see
 
 # Plugins
 
-In counterpartyd everything is plugin. The core application only manages the left menu. Each plugin adds one or more items in this menu. The core application display the corresponding plugin in the main window, each time the user click on one of this item.
+In counterpartygui everything is plugin. The core application only manages the left menu. Each plugin adds one or more items in this menu. The core application display the corresponding plugin in the main window, each time the user click on one of this item.
 
 A plugin is defined by the following conventions:
 
