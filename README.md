@@ -49,6 +49,7 @@ A plugin is defined by the following conventions:
 
 ```
 	function sendAsset() {
+		// prepare the query
         var query = {
             'method': 'do_send',
             'params': {
@@ -59,13 +60,17 @@ A plugin is defined by the following conventions:
             }
         }
 
+        // prepare the confirmation message
         var confirmMessage = "Do you really want to send " +
                              sendFormComp.quantity + " " + root.currentAsset +
                              " to " + sendFormComp.destination;
 
+        // ask a confirmation
         if (GUI.confirm("Confirm send", confirmMessage)) {
+        	// make the RPC call
             var result = xcpApi.call(query);
             if (result) {
+            	// display the transaction hash
                 GUI.alert("Transaction done", result);
             }
         }
