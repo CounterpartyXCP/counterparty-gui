@@ -3,6 +3,7 @@ import appdirs
 import logging
 import os
 import configparser
+import sys
 
 def defaultBackendRpcPort(config):
     if config.TESTNET:
@@ -71,7 +72,7 @@ class Config:
         self.DATA_DIR = dataDir
         for arg in ARGS:
             argName = arg['name'].replace('-', '_')
-            if self.args[argName] is None:
+            if self.args[argName] is None or (isinstance(self.args[argName], bool) and '--{}'.format(arg['name']) not in sys.argv and '-{}'.format(arg['name']) not in sys.argv):
                 self.args[argName] = getDefaultValue(arg['name'])
             setattr(self, argName.upper(), self.args[argName])
 
