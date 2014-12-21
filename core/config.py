@@ -9,6 +9,10 @@ def defaultBackendRpcPort(config):
     else:
         return 4000
 
+def defaultBackendRpc(config):
+    protocol = 'https' if config.BACKEND_RPC_SSL else 'http'
+    return '{}://{}:{}@{}:{}'.format(protocol, config.BACKEND_RPC_USER, config.BACKEND_RPC_PASSWORD, config.BACKEND_RPC_CONNECT, config.BACKEND_RPC_PORT)
+
 ARGS = [
     {'name': 'data-dir', 'params': {'help': 'the directory in which to keep the config file and log file, by default'}},
     {'name': 'config-file', 'params': {'help': 'the location of the configuration file'}},
@@ -19,7 +23,8 @@ ARGS = [
     {'name': 'backend-rpc-password', 'params': {'help': 'the password used to communicate with backend over JSON-RPC'}},
     {'name': 'backend-rpc-ssl', 'params': {'action': 'store_true', 'help': 'use SSL to connect to backend (default: false)'}},
     {'name': 'backend-rpc-ssl-verify', 'params': {'action': 'store_true', 'help':'verify SSL certificate of backend; disallow use of self‐signed certificates (default: false)'}},
-    {'name': 'plugins', 'params': {'action': 'append', 'help': 'active plugins'}, 'default': ['send', 'test']}
+    {'name': 'backend-rpc', 'params': {'help': 'the complete RPC url used to communicate with backend over JSON-RPC'}, 'default': defaultBackendRpc},
+    {'name': 'plugins', 'params': {'action': 'append', 'help': 'active plugins'}, 'default': ['send', 'test']},
 ]
 
 class Config:
@@ -67,8 +72,5 @@ class Config:
             if self.args[argName] is None:
                 self.args[argName] = getDefaultValue(arg['name'])
             setattr(self, argName.upper(), self.args[argName])
-
-        protocol = 'https' if self.BACKEND_RPC_SSL else 'http'
-        self.BACKEND_RPC = '{}://{}:{}@{}:{}'.format(protocol, self.BACKEND_RPC_USER, self.BACKEND_RPC_PASSWORD, self.BACKEND_RPC_CONNECT, self.BACKEND_RPC_PORT) 
 
     
