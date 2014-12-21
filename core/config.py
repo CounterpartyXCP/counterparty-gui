@@ -1,7 +1,8 @@
 import argparse
 import appdirs
-import logging, os, configparser
-
+import logging
+import os
+import configparser
 
 def defaultBackendRpcPort(config):
     if config.TESTNET:
@@ -52,6 +53,7 @@ class Config:
         configFile.read(configPath)
         hasConfig = 'Default' in configFile
         
+        # if `key` not in config file, return the default value evenually defined in ARGS.
         def getDefaultValue(key):
             if hasConfig and key in configFile['Default'] and configFile['Default'][key]:
                 return configFile['Default'][key]

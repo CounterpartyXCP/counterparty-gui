@@ -1,9 +1,7 @@
 import QtQuick 2.3
 import QtQuick.Controls 1.0;
-import QtQuick.Layouts 1.0;
-import QtQuick.Dialogs 1.1;
-import QtQuick.Window 2.1;
 import QtQuick.Controls.Styles 1.1
+import QtQuick.Layouts 1.0;
 
 GroupBox {
     id: sendPane
@@ -48,8 +46,6 @@ GroupBox {
 
         TextField {
             id: txTo
-            activeFocusOnPress: true
-            focus: true
             style: TextFieldStyle {
                 background: Rectangle {
                     implicitWidth: 200

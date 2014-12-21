@@ -1,9 +1,16 @@
-from PyQt5.QtCore import *
-from PyQt5.QtWidgets import *
-from PyQt5.QtGui import *
-from PyQt5.QtQml import *
-from PyQt5.QtQuick import *
 import logging
+
+from PyQt5.QtCore import pyqtSlot
+from PyQt5.QtCore import QVariant
+from PyQt5.QtCore import Qt
+from PyQt5.QtCore import QUrl
+from PyQt5.QtWidgets import QLabel
+from PyQt5.QtWidgets import QMainWindow
+from PyQt5.QtWidgets import QToolBar
+from PyQt5.QtWidgets import QStackedWidget
+from PyQt5.QtWidgets import QWidget
+from PyQt5.QtWidgets import QMessageBox
+from PyQt5.QtQuick import QQuickView
 
 from core.api import CounterpartydAPI
 
@@ -117,6 +124,7 @@ class GUI(QMainWindow):
             QToolBar#menu QLabel[isGroupLabel="true"] { color:#888888; text-transform:uppercase; }
         ''')
 
+    # used in QML to display a confirm dialog
     @pyqtSlot(QVariant, QVariant, result=QVariant)
     def confirm(self, title, text):
         result = QMessageBox.question(self, title, text)
@@ -125,6 +133,7 @@ class GUI(QMainWindow):
         else:
             return False
 
+    # used in QML to display a message dialog
     @pyqtSlot(QVariant, QVariant)
     def alert(self, title, text):
         QMessageBox.information(self, title, text)
