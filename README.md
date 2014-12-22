@@ -2,15 +2,18 @@ counterpartygui
 ================
 
 # Description
+
 `counterpartygui` is a PyQT5 GUI for [`counterpartyd`](https://github.com/CounterpartyXCP/counterpartyd).
 
 # Requirements
+
 * [Python 3](http://python.org)
 * [Python 3 packages](https://github.com/CounterpartyXCP/counterpartygui/blob/master/pip-requirements.txt)
 * [PyQT5](http://www.riverbankcomputing.com/software/pyqt/download5)
 * [`counterpartyd`](https://github.com/CounterpartyXCP/counterpartyd).
 
 # Installation
+
 In order for counterpartygui to function, it must be able to communicate with a
 running instance of counterpartyd.
 counterpartygui needs to know at least the JSON‐RPC password of the counterpartyd
@@ -19,16 +22,35 @@ include it in all command‐line invocations of counterpartygui, such as
 `./counterpartygui.py --backend-rpc-user=USER --backend-rpc-password=PASSWORD`. To make this and other
 options persistent across counterpartygui sessions, one may store the desired
 settings in a configuration file specific to counterpartygui.
-A counterpartyd configuration file looks like this:
+If and only if counterpartygui is to be run on the Bitcoin testnet, with the
+`--testnet` CLI option, counterpartyd must be set to do the same (`--testnet=1`).
+
+# Configuration file
+
+OS  | Path
+------------- | -------------
+MacOS | ~/Library/Application Support/counterpartygui/counterpartygui.conf
+XP | C:\Documents and Settings\username\Application Data\counterpartygui\counterpartygui.conf
+Vista, 7 | C:\Users\username\AppData\Roaming\counterpartyd\counterpartygui.conf
+Linux | ~/.config/counterpartygui/counterpartygui.conf
+
+A counterpartygui configuration file looks like this:
 
 	[Default]
 	backend-rpc-user=USER
 	backend-rpc-password=PASSWORD
+    testnet=1
 
-If and only if counterpartygui is to be run on the Bitcoin testnet, with the
-`--testnet` CLI option, counterpartyd must be set to do the same (`--testnet=1`).
+# Build
+
+Mac OS X:
+     python setup.py py2app
+
+Windows (NO TESTED):
+     python setup.py py2exe
 
 # Usage
+
 The command‐line syntax of counterpartygui is that of
 `./counterpartygui.py {OPTIONS}`.
 
