@@ -59,15 +59,19 @@ For a summary of the command‐line arguments and options, see
 
 # Plugins
 
-In counterpartygui everything is plugin. The core application only manages the left menu. Each plugin adds one or more items in this menu. The core application display the corresponding plugin in the main window, each time the user click on one of this item.
+In counterpartygui everything is plugin. The core application only manages the left menu. Each plugin adds one or more items in this menu. When the user clicks on one of these items, the core application displays the corresponding plugin in the main window.
 
 A plugin is defined by the following conventions:
 
 * it must live in the folder `plugins/{PLUGIN_NAME}/`
 * PLUGIN_NAME folder must contains at least one file `index.qml` that contains the QML root object
-* the root object in `index.qml` must contains two javascript callbacks: `init()` and `onMenuAction(itemValue)`. The former is called once when the application initialise the plugins. The latter is called when the user click on a menu item that belongs to the plugin.
-* the root object in `index.qml` must contains a property `root.menu` that define the items to dsplay in the left menu of the application. This poperty can be populated in the `init()` callback. 
-* the QML context contains an instance of CounterpartydAPI that can be used in javascript to make any RPC call to the counterpartyd API, and a instance of GUI to display alert or confirmation box. For instance :
+* the root object in `index.qml` must contains two javascript callbacks: `init()` and `onMenuAction(itemValue)`. The former is called once, when the application initialises plugins. The latter is called when the user clicks on a menu item that belongs to the plugin.
+* the root object in `index.qml` must contains a property `root.menu`. It contains the list of items to dsplay in the left menu and can be populated in the `init()` callback. 
+* the QML context contains:
+    - an instance of CounterpartydAPI (core/api.py) to make any RPC call to the counterpartyd API with Javascript, 
+    - an instance of GUI (core/gui.py) to display messages or ask confirmations.
+
+Example:
 
 ```
 	function sendAsset() {
