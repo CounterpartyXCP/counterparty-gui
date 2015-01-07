@@ -8,9 +8,9 @@ counterpartygui
 # Requirements
 
 * [Python 3](http://python.org)
-* [Python 3 packages](https://github.com/CounterpartyXCP/counterpartygui/blob/master/pip-requirements.txt)
+* [Python 3 packages](https://github.com/CounterpartyXCP/counterparty-gui/blob/develop/pip-requirements.txt)
 * [PyQT5](http://www.riverbankcomputing.com/software/pyqt/download5)
-* [`counterpartyd`](https://github.com/CounterpartyXCP/counterpartyd).
+* [`counterpartyd`](https://github.com/CounterpartyXCP/counterpartyd)
 
 # Installation
 
@@ -34,20 +34,20 @@ XP | C:\Documents and Settings\username\Application Data\counterpartygui\counter
 Vista, 7 | C:\Users\username\AppData\Roaming\counterpartyd\counterpartygui.conf
 Linux | ~/.config/counterpartygui/counterpartygui.conf
 
-A counterpartygui configuration file looks like this:
+A counterparty-gui configuration file looks like this:
 
 	[Default]
 	backend-rpc-user=USER
 	backend-rpc-password=PASSWORD
-    testnet=1
+	testnet=1
+
+Note: `testnet=1` should be removed for mainnet use.
 
 # Build
 
-Mac OS X:
-     python setup.py py2app
+Mac OS X: `python setup.py py2app`
 
-Windows (NO TESTED):
-     python setup.py py2exe
+Windows: `python setup.py py2exe` (in the future)
 
 # Usage
 
@@ -59,7 +59,7 @@ For a summary of the command‐line arguments and options, see
 
 # Plugins
 
-In counterpartygui everything is plugin. The core application only manages the left menu. Each plugin adds one or more items in this menu. When the user clicks on one of these items, the core application displays the corresponding plugin in the main window.
+In counterpartygui everything is a plugin. The core application only manages the left menu. Each plugin adds one or more items in this menu. When the user clicks on one of these items, the core application displays the corresponding plugin in the main window.
 
 A plugin is defined by the following conventions:
 
