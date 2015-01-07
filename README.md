@@ -43,11 +43,9 @@ A counterpartygui configuration file looks like this:
 
 # Build
 
-Mac OS X:
-     python setup.py py2app
+Mac OS X: `python setup.py py2app`
 
-Windows (NO TESTED):
-     python setup.py py2exe
+Windows: `python setup.py py2exe`
 
 # Usage
 
@@ -59,7 +57,7 @@ For a summary of the command‐line arguments and options, see
 
 # Plugins
 
-In counterpartygui everything is plugin. The core application only manages the left menu. Each plugin adds one or more items in this menu. When the user clicks on one of these items, the core application displays the corresponding plugin in the main window.
+In counterpartygui everything is a plugin. The core application only manages the left menu. Each plugin adds one or more items in this menu. When the user clicks on one of these items, the core application displays the corresponding plugin in the main window.
 
 A plugin is defined by the following conventions:
 
