@@ -8,7 +8,7 @@ counterpartygui
 # Requirements
 
 * [Python 3](http://python.org)
-* [Python 3 packages](https://github.com/CounterpartyXCP/counterpartygui/blob/master/pip-requirements.txt)
+* [Python 3 packages](https://github.com/CounterpartyXCP/counterparty-gui/blob/develop/pip-requirements.txt)
 * [PyQT5](http://www.riverbankcomputing.com/software/pyqt/download5)
 * [`counterpartyd`](https://github.com/CounterpartyXCP/counterpartyd).
 
