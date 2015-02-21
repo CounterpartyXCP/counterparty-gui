@@ -1,52 +1,54 @@
-"""
-py2app/py2exe build script for CounterParty GUI.
-
-Usage (Mac OS X):
-     python setup.py py2app
-
-Usage (Windows):
-     python setup.py py2exe
-
-"""
 import sys
-from setuptools import setup
+from setuptools import setup, find_packages
 
-APP = ['counterpartygui.py']
-DATA_FILES = ['core', 'plugins']
+APP_VERSION = "1.0.0"
 
-if sys.platform == 'darwin':
-    extra_options = {
-        'setup_requires': ['py2app'],
-        'app': APP,
-        'data_files': DATA_FILES,
-        'options': {
-            'py2app': {
-                'argv_emulation': True, 
-                'includes': ['sip', 'PyQt5', 'PyQt5.QtCore', 'PyQt5.QtGui', 'PyQt5.QtQml', 'PyQt5.QtNetwork'],
-                'iconfile':'counterparty.icns',
-                'plist': {
-                    'CFBundleShortVersionString': '1.0',
-                    'CFBundleGetInfoString': 'CounterParty GUI'
-                }
-            }
-        }
-    }
-elif sys.platform == 'win32':
-    extra_options = {
-        'setup_requires': ['py2exe'],
-        'app': APP,
-        'data_files': DATA_FILES
-    }
-else:
-    extra_options = {
-        'scripts': APP,
-        'data_files': DATA_FILES
-    }
-print(extra_options)
+data_files = [
+    'plugins'
+]
 
-setup(
-    name = 'counterpartygui',
-    version = '1.0',
-    author = 'Counterparty',
-    **extra_options
-)
+required_packages = [
+    'appdirs',
+    'counterparty-cli'
+]
+
+setup_options = {
+    'name': 'counterparty-gui',
+    'version': APP_VERSION,
+    'author': 'Counterparty Foundation',
+    'author_email': 'support@counterparty.io',
+    'maintainer': 'Ouziel Slama',
+    'maintainer_email': 'ouziel@counterparty.io',
+    'url': 'http://counterparty.io',
+    'license': 'MIT',
+    'description': 'Counterparty Wallet',
+    'long_description': '',
+    'keywords': 'counterparty,bitcoin',
+    'classifiers': [
+        "Development Status :: 5 - Production/Stable",
+        "Environment :: Console",
+        "Intended Audience :: Developers",
+        "Intended Audience :: End Users/Desktop",
+        "Intended Audience :: Financial and Insurance Industry",
+        "License :: OSI Approved :: MIT License",
+        "Natural Language :: English",
+        "Operating System :: Microsoft :: Windows",
+        "Operating System :: POSIX",
+        "Programming Language :: Python :: 3 :: Only",
+        "Topic :: Office/Business :: Financial",
+        "Topic :: System :: Distributed Computing"
+    ],
+    'download_url': 'https://github.com/CounterpartyXCP/counterparty-gui/releases/tag/v' + APP_VERSION,
+    'provides': ['counterpartygui'],
+    'packages': find_packages(),
+    'data_files': data_files,
+    'zip_safe': False,
+    'install_requires': required_packages,
+    'entry_points': {
+        'gui_scripts': [
+            'counterparty-gui = counterpartygui.core.gui:main'
+        ]
+    }
+}
+
+setup(**setup_options)

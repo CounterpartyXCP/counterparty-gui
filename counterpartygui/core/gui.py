@@ -1,5 +1,7 @@
 import logging
 import json
+import os
+import sys
 from decimal import Decimal as D
 
 from PyQt5.QtCore import pyqtSlot
@@ -16,9 +18,11 @@ from PyQt5.QtWidgets import QMessageBox
 from PyQt5.QtWidgets import QAction
 from PyQt5.QtWidgets import QMessageBox
 from PyQt5.QtWidgets import QMenuBar
+from PyQt5.QtWidgets import QApplication
 from PyQt5.QtQuick import QQuickView
 
-from core.api import CounterpartydAPI
+from counterpartygui.core.api import CounterpartydAPI
+from counterpartygui.core.config import Config
 
 class MenuItem(QLabel):
     def __init__(self, text, parent=None):
@@ -105,7 +109,9 @@ class GUI(QMainWindow):
             context.setContextProperty("GUI", self)
 
             # load QML file
-            view.setSource(QUrl('plugins/{}/index.qml'.format(pluginName, pluginName)));            
+            CURR_DIR = os.path.dirname(os.path.realpath(os.path.join(os.getcwd(), os.path.expanduser(__file__))))
+            plugin_index_path = os.path.join(CURR_DIR, '..', 'plugins', pluginName, 'index.qml')
+            view.setSource(QUrl(plugin_index_path))           
             
             plugin = view.rootObject()
             pluginIndex = len(self.plugins)
@@ -169,4 +175,14 @@ class GUI(QMainWindow):
     def alert(self, title, text):
         QMessageBox.information(self, title, text)
         
-   
+def main():
+    app = QApplication(sys.argv)
+    config = Config()
+    screen = GUI(config)
+
+    def quitApp():
+        sys.exit()
+
+    app.aboutToQuit.connect(quitApp)
+    app.exec()
+
