@@ -5,7 +5,7 @@ APP_VERSION = "1.0.0"
 
 # TODO: make dynamic
 data_files =  {
-    '': ['plugins/send/*.*', 'plugins/test/*.*']
+    '': ['plugins/send/*.*', 'plugins/test/*.*', 'assets/*.*']
 }    
 
 required_packages = [

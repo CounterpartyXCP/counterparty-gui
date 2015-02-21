@@ -21,8 +21,12 @@ from PyQt5.QtWidgets import QMenuBar
 from PyQt5.QtWidgets import QApplication
 from PyQt5.QtQuick import QQuickView
 
+from PyQt5 import QtWidgets, QtCore, QtGui
+
 from counterpartygui.core.api import CounterpartydAPI
 from counterpartygui.core.config import Config
+
+CURR_DIR = os.path.dirname(os.path.realpath(os.path.join(os.getcwd(), os.path.expanduser(__file__))))
 
 class MenuItem(QLabel):
     def __init__(self, text, parent=None):
@@ -109,7 +113,6 @@ class GUI(QMainWindow):
             context.setContextProperty("GUI", self)
 
             # load QML file
-            CURR_DIR = os.path.dirname(os.path.realpath(os.path.join(os.getcwd(), os.path.expanduser(__file__))))
             plugin_index_path = os.path.join(CURR_DIR, '..', 'plugins', pluginName, 'index.qml')
             view.setSource(QUrl(plugin_index_path))           
             
@@ -177,6 +180,15 @@ class GUI(QMainWindow):
         
 def main():
     app = QApplication(sys.argv)
+    splash_path = os.path.join(CURR_DIR, '..', 'assets', 'splash.png')
+    splash_pix = QtGui.QPixmap(splash_path)
+    splash = QtWidgets.QSplashScreen(splash_pix, Qt.WindowStaysOnTopHint)
+    splash.setMask(splash_pix.mask())
+    splash.show()
+    splash.showMessage("Loading wallet...", Qt.AlignBottom | Qt.AlignHCenter);
+
+    app.processEvents()
+
     config = Config()
     screen = GUI(config)
 
@@ -184,5 +196,7 @@ def main():
         sys.exit()
 
     app.aboutToQuit.connect(quitApp)
+
+    splash.finish(screen)
     app.exec()
 
