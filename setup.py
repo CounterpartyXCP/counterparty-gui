@@ -3,9 +3,10 @@ from setuptools import setup, find_packages
 
 APP_VERSION = "1.0.0"
 
-data_files = [
-    'plugins'
-]
+# TODO: make dynamic
+data_files =  {
+    '': ['plugins/send/*.*', 'plugins/test/*.*']
+}    
 
 required_packages = [
     'appdirs',
@@ -41,7 +42,8 @@ setup_options = {
     'download_url': 'https://github.com/CounterpartyXCP/counterparty-gui/releases/tag/v' + APP_VERSION,
     'provides': ['counterpartygui'],
     'packages': find_packages(),
-    'data_files': data_files,
+    'include_package_data': True,
+    'package_data': data_files,
     'zip_safe': False,
     'install_requires': required_packages,
     'entry_points': {
