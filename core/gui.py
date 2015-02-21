@@ -13,6 +13,9 @@ from PyQt5.QtWidgets import QToolBar
 from PyQt5.QtWidgets import QStackedWidget
 from PyQt5.QtWidgets import QWidget
 from PyQt5.QtWidgets import QMessageBox
+from PyQt5.QtWidgets import QAction
+from PyQt5.QtWidgets import QMessageBox
+from PyQt5.QtWidgets import QMenuBar
 from PyQt5.QtQuick import QQuickView
 
 from core.api import CounterpartydAPI
@@ -50,17 +53,40 @@ class GUI(QMainWindow):
         self.resize(1024, 680)
         self.setWindowTitle("Counterparty GUI")
 
+        def openPreference():
+            self.config.initialize(openDialog=True)
+            self.loadPlugins()
+
+        # Add Preferences menu 
+        mainMenuBar = QMenuBar()
+        newAct = QAction("Preferences...", self)
+        newAct.triggered.connect(openPreference)
+        fileMenu = mainMenuBar.addMenu("Counterparty GUI")
+        fileMenu.addAction(newAct)
+        self.setMenuBar(mainMenuBar)
+
+        self.loadPlugins()
+
+    def loadPlugins(self):
+
         # init toolbar
-        toolbar = QToolBar()
-        toolbar.setAutoFillBackground(True);
-        toolbar.setObjectName('menu')
-        toolbar.setMovable(False)
-        toolbar.setFloatable(False)
-        toolbar.setToolButtonStyle(Qt.ToolButtonTextBesideIcon|Qt.AlignLeft)
-        self.addToolBar(Qt.LeftToolBarArea, toolbar)
+        if hasattr(self, 'toolbar'):
+            self.removeToolBar(self.toolbar)
+            del(self.toolbar)
+            
+        self.toolbar = QToolBar()
+        self.toolbar.setAutoFillBackground(True);
+        self.toolbar.setObjectName('menu')
+        self.toolbar.setMovable(False)
+        self.toolbar.setFloatable(False)
+        self.toolbar.setToolButtonStyle(Qt.ToolButtonTextBesideIcon|Qt.AlignLeft)
+        self.addToolBar(Qt.LeftToolBarArea, self.toolbar)
         self.currentMenuItem = None
 
         # init QML plugin container
+        if hasattr(self, 'stackedWidget'):
+            del(self.stackedWidget)
+
         self.stackedWidget = QStackedWidget(self)
         self.plugins = []
 
@@ -95,7 +121,7 @@ class GUI(QMainWindow):
                 if 'groupLabel' in menu:
                     menuGroupLabel = QLabel(menu['groupLabel'])
                     menuGroupLabel.setProperty('isGroupLabel', 'true')
-                    toolbar.addWidget(menuGroupLabel)
+                    self.toolbar.addWidget(menuGroupLabel)
                 # menu item
                 items = []
                 for menuItem in menu['items']:
@@ -104,7 +130,7 @@ class GUI(QMainWindow):
                         items[-1].setProperty('pluginIndex', pluginIndex)
                         items[-1].setProperty('actionValue', menuItem['value'])
                         items[-1].setProperty('isAction', 'true') 
-                        toolbar.addWidget(items[-1])
+                        self.toolbar.addWidget(items[-1])
                         if self.currentMenuItem is None:
                             self.currentMenuItem = items[-1]
 
