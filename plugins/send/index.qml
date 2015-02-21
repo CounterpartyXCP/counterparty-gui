@@ -10,19 +10,19 @@ Rectangle {
     // init callback
     function init() {
         // get balances for addresses in the wallet
-        var balances = xcpApi.getBalances()
+        var wallet = xcpApi.call({'method': 'wallet', 'params': {}});
         var menu = {
             'groupLabel': 'Wallet',
             'items': []
         }
         // generate items of the left menu, one item per asset
-        for (var asset in balances) {
+        for (var asset in wallet['assets']) {
             var assetName = String(asset)
             // short the name if free asset
             if (assetName.substring(0,1) === "A") {
                 assetName = assetName.substring(0,4) + '...' + assetName.substring(assetName.length - 4)
             }
-            var amount = Number(balances[asset]).toFixed(2)
+            var amount = Number(wallet['assets'][asset]).toFixed(2)
             var label = assetName + ' <font style="color:#888888">[' + amount + ']</font>';
             if (asset === 'BTC' || asset === 'XCP') {
                 menu['items'].unshift({'label': label, 'value': asset});
@@ -43,7 +43,7 @@ Rectangle {
         root.currentAsset = itemValue;
 
         // get balance by address and sends list for the current asset
-        var assetInfo = xcpApi.getAssetInfo(root.currentAsset);
+        var assetInfo = xcpApi.call({'method': 'asset', 'params': {'asset_name': root.currentAsset}});
 
         // display the balance
         assetBalanceComp.text = '<b>' + root.currentAsset + '</b><br />' + assetInfo['balance'];
@@ -76,7 +76,7 @@ Rectangle {
     function sendAsset() {
         // prepare RPC call params
         var query = {
-            'method': 'do_send',
+            'method': 'create_send',
             'params': {
                 'source':  sendFormComp.source.split(" ").shift(),
                 'destination': sendFormComp.destination,
@@ -91,11 +91,19 @@ Rectangle {
                              " to " + sendFormComp.destination;
 
         if (GUI.confirm("Confirm send", confirmMessage)) {
-            // RPC call
-            var result = xcpApi.call(query);
-            if (result) {
-                // display transaction hash
-                GUI.alert("Transaction done", result);
+            // Compose transaction
+            var unsigned_hex = xcpApi.call(query);
+            if (unsigned_hex) {
+                // Sign transaction
+                var signed_hex = xcpApi.call({'method': 'sign_raw_transaction', 'params': {'tx_hex': unsigned_hex}});
+                if (signed_hex) {
+                    // Broadcast transaction
+                    var tx_hash = xcpApi.call({'method': 'send_raw_transaction', 'params': {'tx_hex': signed_hex}});
+                    // display transaction hash
+                    if (tx_hash) {
+                        GUI.alert("Transaction done", tx_hash);
+                    }
+                }
             }
         }
     }

@@ -1,9 +1,12 @@
 import logging
+import json
+from decimal import Decimal as D
 
 from PyQt5.QtCore import pyqtSlot
 from PyQt5.QtCore import QVariant
 from PyQt5.QtCore import Qt
 from PyQt5.QtCore import QUrl
+from PyQt5.QtCore import QObject
 from PyQt5.QtWidgets import QLabel
 from PyQt5.QtWidgets import QMainWindow
 from PyQt5.QtWidgets import QToolBar
@@ -61,15 +64,17 @@ class GUI(QMainWindow):
         self.stackedWidget = QStackedWidget(self)
         self.plugins = []
 
-        # init xcpApi
-        self.xcpApi = CounterpartydAPI(config) 
+        # init clientapi
+        self.xcpApi = CounterpartydAPI(self.config)
+
         actionIndex = 0
         for pluginName in self.config.PLUGINS:
             view = QQuickView();
             view.setFlags(Qt.SubWindow)
 
-            # add xcpApi into the plugin context
+            # add clientapi into the plugin context
             context = view.rootContext()
+
             context.setContextProperty("xcpApi", self.xcpApi)
             context.setContextProperty("GUI", self)
 
