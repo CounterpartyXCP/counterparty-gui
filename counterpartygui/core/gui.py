@@ -20,6 +20,7 @@ from PyQt5.QtWidgets import QMessageBox
 from PyQt5.QtWidgets import QMenuBar
 from PyQt5.QtWidgets import QApplication
 from PyQt5.QtQuick import QQuickView
+from PyQt5.QtQml import QJSValue
 
 from PyQt5 import QtWidgets, QtCore, QtGui
 
@@ -125,6 +126,8 @@ class GUI(QMainWindow):
 
             # generate the left menu
             menu = plugin.property('menu')
+            if isinstance(menu, QJSValue):
+                menu = menu.toVariant()
             if menu and isinstance(menu, dict) and 'items' in menu and isinstance(menu['items'], list):
                 # menu title
                 if 'groupLabel' in menu:

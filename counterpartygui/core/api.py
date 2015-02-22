@@ -9,7 +9,7 @@ from PyQt5.QtCore import QObject
 from PyQt5.QtCore import QVariant
 from PyQt5.QtCore import pyqtSlot
 from PyQt5.QtWidgets import QMessageBox, QWidget
-
+from PyQt5.QtQml import QJSValue
 from counterpartycli import clientapi
 
 class DecimalEncoder(json.JSONEncoder):
@@ -39,6 +39,8 @@ class CounterpartydAPI(QObject):
 
     @pyqtSlot(QVariant, result=QVariant)
     def call(self, query):
+        if isinstance(query, QJSValue):
+            query = query.toVariant()
         # TODO: hack, find a real solution
         print(query)
         try:
