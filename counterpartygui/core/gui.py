@@ -115,7 +115,7 @@ class GUI(QMainWindow):
 
             # load QML file
             plugin_index_path = os.path.join(CURR_DIR, '..', 'plugins', pluginName, 'index.qml')
-            view.setSource(QUrl(plugin_index_path))           
+            view.setSource(QUrl.fromLocalFile(plugin_index_path))
             
             plugin = view.rootObject()
             pluginIndex = len(self.plugins)

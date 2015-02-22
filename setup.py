@@ -53,4 +53,37 @@ setup_options = {
     }
 }
 
+if sys.argv[1] == 'py2exe':
+    import py2exe
+    from py2exe.distutils_buildexe import py2exe as _py2exe
+
+    WIN_DIST_DIR = 'counterparty-gui-win32-{}'.format(APP_VERSION)
+    
+    class py2exe(_py2exe):
+        def run(self):
+            from counterpartygui.setup import before_py2exe_build, after_py2exe_build
+            # prepare build
+            before_py2exe_build(WIN_DIST_DIR)
+            # build exe's
+            _py2exe.run(self)
+            # tweak build
+            after_py2exe_build(WIN_DIST_DIR)
+
+    # Update setup_options with py2exe specifics options
+    setup_options.update({
+        'console': [
+            'counterparty-gui.py'
+        ],
+        'zipfile': 'library/site-packages.zip',
+        'options': {
+            'py2exe': {
+                'dist_dir': WIN_DIST_DIR,
+                'includes': ['sip', 'PyQt5', 'PyQt5.QtCore', 'PyQt5.QtGui', 'PyQt5.QtQml', 'PyQt5.QtNetwork', 'PyQt5.QtQuick', 'PyQt5.QtQuickWidgets']
+            }
+        },
+        'cmdclass': {
+            'py2exe': py2exe
+        }
+    })
+
 setup(**setup_options)
