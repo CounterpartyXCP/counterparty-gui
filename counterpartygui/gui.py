@@ -26,6 +26,7 @@ from PyQt5 import QtWidgets, QtCore, QtGui
 
 from counterpartygui.api import CounterpartydAPI
 from counterpartygui.config import Config
+from counterpartycli.clientapi import ConfigurationError
 
 CURR_DIR = os.path.dirname(os.path.realpath(os.path.join(os.getcwd(), os.path.expanduser(__file__))))
 
@@ -78,6 +79,14 @@ class GUI(QMainWindow):
         self.loadPlugins()
 
     def loadPlugins(self):
+        # init clientapi
+        try:
+            self.xcpApi = CounterpartydAPI(self.config)
+        except ConfigurationError as e:
+            QMessageBox.critical(QWidget(), "Configuration Error", str(e))
+            self.config.initialize(openDialog=True, splash=self.splash)
+            self.loadPlugins()
+            return
 
         # init toolbar
         if hasattr(self, 'toolbar'):
@@ -99,9 +108,6 @@ class GUI(QMainWindow):
 
         self.stackedWidget = QStackedWidget(self)
         self.plugins = []
-
-        # init clientapi
-        self.xcpApi = CounterpartydAPI(self.config)
 
         actionIndex = 0
         for pluginName in self.config.PLUGINS:
