@@ -183,8 +183,7 @@ class GUI(QMainWindow):
         
 def main():
     app = QApplication(sys.argv)
-    splash_path = os.path.join(CURR_DIR, '..', 'assets', 'splash.png')
-    splash_pix = QtGui.QPixmap(splash_path)
+    splash_pix = QtGui.QPixmap('assets/splash.png')
     splash = QtWidgets.QSplashScreen(splash_pix, Qt.WindowStaysOnTopHint)
     splash.setMask(splash_pix.mask())
     splash.show()
