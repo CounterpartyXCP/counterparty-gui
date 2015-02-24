@@ -24,8 +24,8 @@ from PyQt5.QtQml import QJSValue
 
 from PyQt5 import QtWidgets, QtCore, QtGui
 
-from counterpartygui.core.api import CounterpartydAPI
-from counterpartygui.core.config import Config
+from counterpartygui.api import CounterpartydAPI
+from counterpartygui.config import Config
 
 CURR_DIR = os.path.dirname(os.path.realpath(os.path.join(os.getcwd(), os.path.expanduser(__file__))))
 
@@ -114,8 +114,8 @@ class GUI(QMainWindow):
             context.setContextProperty("GUI", self)
 
             # load QML file
-            plugin_index_path = os.path.join(CURR_DIR, '..', 'plugins', pluginName, 'index.qml')
-            view.setSource(QUrl.fromLocalFile(plugin_index_path))
+            plugin_index_path = 'plugins/{}/index.qml'.format(pluginName)
+            view.setSource(QUrl(plugin_index_path))
             
             plugin = view.rootObject()
             pluginIndex = len(self.plugins)
