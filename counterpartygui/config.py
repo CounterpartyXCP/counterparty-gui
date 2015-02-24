@@ -25,13 +25,13 @@ class Config:
         self.PLUGINS = ['send', 'test']
         self.initialize()
 
-    def initialize(self, openDialog=False):
+    def initialize(self, openDialog=False, splash=None):
         configdir = appdirs.user_config_dir(appauthor=config.XCP_NAME, appname=config.APP_NAME, roaming=True)
         configfile = os.path.join(configdir, 'client.conf')
         config_exists = os.path.exists(configfile)
 
         if not config_exists:
-            generate_config_files()
+            generate_config_file(configfile, client.CONFIG_ARGS)
 
         # Parse command-line arguments.
         parser = argparse.ArgumentParser(prog=APP_NAME, description='Counterparty CLI for counterparty-server', add_help=False, conflict_handler='resolve')
@@ -42,9 +42,16 @@ class Config:
         self.args = parser.parse_known_args()[0]
 
         if not config_exists or openDialog:
+            is_splash_visible = False
+            if splash:
+                is_splash_visible = splash.isVisible()
+                if is_splash_visible:
+                    splash.hide()
             configfile = getattr(self.args, 'config_file', None) or configfile
             configUI = ConfigDialog(configfile, newconfig=not config_exists)
             configUI.exec()
+            if is_splash_visible:
+                splash.show()
 
         parser = add_config_arguments(parser, client.CONFIG_ARGS, 'client.conf', config_file_arg_name='client_config_file')
 

@@ -54,16 +54,17 @@ class MenuItem(QLabel):
 
 class GUI(QMainWindow):
 
-    def __init__(self, config):
+    def __init__(self, config, splash=None):
         super().__init__()
 
         self.config = config
+        self.splash = splash
 
         self.resize(1024, 680)
         self.setWindowTitle("Counterparty GUI")
 
         def openPreference():
-            self.config.initialize(openDialog=True)
+            self.config.initialize(openDialog=True, splash=self.splash)
             self.loadPlugins()
 
         # Add Preferences menu 
@@ -192,7 +193,7 @@ def main():
     app.processEvents()
 
     config = Config()
-    screen = GUI(config)
+    screen = GUI(config, splash=splash)
 
     def quitApp():
         sys.exit()
