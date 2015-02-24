@@ -1,61 +1,39 @@
-counterpartygui
+counterparty-gui
 ================
 
 # Description
 
-`counterpartygui` is a PyQT5 GUI for [`counterpartyd`](https://github.com/CounterpartyXCP/counterpartyd).
+`counterparty-gui` is a PyQT5 GUI for [`counterparty-lib`](https://github.com/CounterpartyXCP/counterpartyd).
 
 # Requirements
 
 * [Python 3](http://python.org)
-* [Python 3 packages](https://github.com/CounterpartyXCP/counterparty-gui/blob/develop/pip-requirements.txt)
 * [PyQT5](http://www.riverbankcomputing.com/software/pyqt/download5)
-* [`counterpartyd`](https://github.com/CounterpartyXCP/counterpartyd)
+* [`counterparty-cli`](https://github.com/CounterpartyXCP/counterparty-cli)
+* [`Bitcoin Core`](https://bitcoin.org/en/download) (OR [`btcwallet`](https://github.com/btcsuite/btcwallet) OR [`Electrum`](https://electrum.org/download.html))
 
 # Installation
 
-In order for counterpartygui to function, it must be able to communicate with a
-running instance of counterpartyd.
-counterpartygui needs to know at least the JSON‐RPC password of the counterpartyd
-with which it is supposed to communicate. The simplest way to set this is to
-include it in all command‐line invocations of counterpartygui, such as
-`./counterpartygui.py --backend-rpc-user=USER --backend-rpc-password=PASSWORD`. To make this and other
-options persistent across counterpartygui sessions, one may store the desired
-settings in a configuration file specific to counterpartygui.
-If and only if counterpartygui is to be run on the Bitcoin testnet, with the
-`--testnet` CLI option, counterpartyd must be set to do the same (`--testnet=1`).
+**Linux and Mac OS X**
 
-# Configuration file
+```
+$ git clone https://github.com/CounterpartyXCP/counterparty-gui.git
+$ cd counterparty-gui
+$ pip3 install -r requirements.txt
+$ python3 setup.py install
+```
 
-OS  | Path
-------------- | -------------
-MacOS | ~/Library/Application Support/counterpartygui/counterpartygui.conf
-XP | C:\Documents and Settings\username\Application Data\counterpartygui\counterpartygui.conf
-Vista, 7 | C:\Users\username\AppData\Roaming\counterpartyd\counterpartygui.conf
-Linux | ~/.config/counterpartygui/counterpartygui.conf
+**Windows**
 
-A counterparty-gui configuration file looks like this:
-
-	[Default]
-	backend-rpc-user=USER
-	backend-rpc-password=PASSWORD
-	testnet=1
-
-Note: `testnet=1` should be removed for mainnet use.
-
-# Build
-
-Mac OS X: `python setup.py py2app`
-
-Windows: `python setup.py py2exe` (in the future)
+Download and execute the MSI [installer](https://github.com/CounterpartyXCP/counterparty-gui/releases).
 
 # Usage
 
-The command‐line syntax of counterpartygui is that of
-`./counterpartygui.py {OPTIONS}`.
+The command‐line syntax of counterparty-gui is that of
+`./counterparty-gui.py {OPTIONS}`.
 
-For a summary of the command‐line arguments and options, see
-`./counterpartygui.py --help`.
+For a summary of the command‐line options, see
+`./counterparty-gui.py --help`.
 
 # Plugins
 
@@ -68,7 +46,7 @@ A plugin is defined by the following conventions:
 * the root object in `index.qml` must contains two javascript callbacks: `init()` and `onMenuAction(itemValue)`. The former is called once, when the application initialises plugins. The latter is called when the user clicks on a menu item that belongs to the plugin.
 * the root object in `index.qml` must contains a property `root.menu`. It contains the list of items to dsplay in the left menu and can be populated in the `init()` callback. 
 * the QML context contains:
-    - an instance of CounterpartydAPI (core/api.py) to make any RPC call to the counterpartyd API with Javascript, 
+    - an instance of CounterpartydAPI (core/api.py) to make any RPC call to the counterpartyd API or the Wallet with Javascript, 
     - an instance of GUI (core/gui.py) to display messages or ask confirmations.
 
 Example:
@@ -77,7 +55,7 @@ Example:
 	function sendAsset() {
 		// prepare the query
         var query = {
-            'method': 'do_send',
+            'method': 'create_send',
             'params': {
                 'source':  sendFormComp.source,
                 'destination': sendFormComp.destination,
@@ -91,13 +69,20 @@ Example:
                              sendFormComp.quantity + " " + root.currentAsset +
                              " to " + sendFormComp.destination;
 
-        // ask a confirmation
         if (GUI.confirm("Confirm send", confirmMessage)) {
-        	// make the RPC call
-            var result = xcpApi.call(query);
-            if (result) {
-            	// display the transaction hash
-                GUI.alert("Transaction done", result);
+            // Compose transaction
+            var unsigned_hex = xcpApi.call(query);
+            if (unsigned_hex) {
+                // Sign transaction
+                var signed_hex = xcpApi.call({'method': 'sign_raw_transaction', 'params': {'tx_hex': unsigned_hex}});
+                if (signed_hex) {
+                    // Broadcast transaction
+                    var tx_hash = xcpApi.call({'method': 'send_raw_transaction', 'params': {'tx_hex': signed_hex}});
+                    // display transaction hash
+                    if (tx_hash) {
+                        GUI.alert("Transaction done", tx_hash);
+                    }
+                }
             }
         }
     }
