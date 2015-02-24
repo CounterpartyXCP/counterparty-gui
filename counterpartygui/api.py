@@ -35,7 +35,8 @@ class CounterpartydAPI(QObject):
                             counterparty_rpc_ssl=config.COUNTERPARTY_RPC_SSL, counterparty_rpc_ssl_verify=config.COUNTERPARTY_RPC_SSL_VERIFY,
                             wallet_name=config.WALLET_NAME, wallet_connect=config.WALLET_CONNECT, wallet_port=config.WALLET_PORT, 
                             wallet_user=config.WALLET_USER, wallet_password=config.WALLET_PASSWORD,
-                            wallet_ssl=config.WALLET_SSL, wallet_ssl_verify=config.WALLET_SSL_VERIFY)
+                            wallet_ssl=config.WALLET_SSL, wallet_ssl_verify=config.WALLET_SSL_VERIFY,
+                            requests_timeout=config.REQUESTS_TIMEOUT)
 
     @pyqtSlot(QVariant, result=QVariant)
     def call(self, query):
