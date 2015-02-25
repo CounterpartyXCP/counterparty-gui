@@ -6,6 +6,7 @@ import time
 from decimal import Decimal as D
 
 from PyQt5.QtCore import QObject
+from PyQt5.QtCore import Qt
 from PyQt5.QtCore import QVariant
 from PyQt5.QtCore import pyqtSlot
 from PyQt5.QtWidgets import QMessageBox, QWidget
@@ -23,7 +24,10 @@ class DecimalEncoder(json.JSONEncoder):
 class CounterpartydRPCError(Exception):
     def __init__(self, message):
         super().__init__(message)
-        QMessageBox.critical(QWidget(), "RPC Error", message)
+        msgBox = QMessageBox()
+        msgBox.setText(message)
+        msgBox.setModal(True)
+        msgBox.show()
         raise Exception(message)
 
 class CounterpartydAPI(QObject):

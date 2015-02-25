@@ -55,17 +55,16 @@ class MenuItem(QLabel):
 
 class GUI(QMainWindow):
 
-    def __init__(self, config, splash=None):
+    def __init__(self, config):
         super().__init__()
 
         self.config = config
-        self.splash = splash
 
         self.resize(1024, 680)
         self.setWindowTitle("Counterparty GUI")
 
         def openPreference():
-            self.config.initialize(openDialog=True, splash=self.splash)
+            self.config.initialize(openDialog=True)
             self.loadPlugins()
 
         # Add Preferences menu 
@@ -83,9 +82,11 @@ class GUI(QMainWindow):
         try:
             self.xcpApi = CounterpartydAPI(self.config)
         except ConfigurationError as e:
-            QMessageBox.critical(QWidget(), "Configuration Error", str(e))
-            self.config.initialize(openDialog=True, splash=self.splash)
-            self.loadPlugins()
+            self.show()
+            msgBox = QMessageBox(self)
+            msgBox.setText(str(e))
+            msgBox.setModal(True)
+            msgBox.show()
             return
 
         # init toolbar
@@ -198,8 +199,8 @@ def main():
 
     app.processEvents()
 
-    config = Config()
-    screen = GUI(config, splash=splash)
+    config = Config(splash=splash)
+    screen = GUI(config)
 
     def quitApp():
         sys.exit()

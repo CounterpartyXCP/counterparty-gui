@@ -21,11 +21,12 @@ APP_NAME = 'counterparty-gui'
 APP_VERSION = '1.0.0'
 
 class Config:
-    def __init__(self):
+    def __init__(self, splash=None):
         self.PLUGINS = ['send', 'test']
+        self.splash = splash
         self.initialize()
 
-    def initialize(self, openDialog=False, splash=None):
+    def initialize(self, openDialog=False):
         configdir = appdirs.user_config_dir(appauthor=config.XCP_NAME, appname=config.APP_NAME, roaming=True)
         configfile = os.path.join(configdir, 'client.conf')
         config_exists = os.path.exists(configfile)
@@ -43,15 +44,15 @@ class Config:
 
         if not config_exists or openDialog:
             is_splash_visible = False
-            if splash:
-                is_splash_visible = splash.isVisible()
+            if self.splash:
+                is_splash_visible = self.splash.isVisible()
                 if is_splash_visible:
-                    splash.hide()
+                    self.splash.hide()
             configfile = getattr(self.args, 'config_file', None) or configfile
             configUI = ConfigDialog(configfile, newconfig=not config_exists)
             configUI.exec()
             if is_splash_visible:
-                splash.show()
+                self.splash.show()
 
         parser = add_config_arguments(parser, client.CONFIG_ARGS, 'client.conf', config_file_arg_name='client_config_file')
 
@@ -86,7 +87,7 @@ class ConfigDialog(QtWidgets.QDialog):
             knownConfig = {}
 
         self.setMinimumWidth(400)
-
+        self.setModal(True)
         self.setWindowTitle('Configuration')
 
         tabs = QtWidgets.QTabWidget()
