@@ -4,11 +4,6 @@ import counterpartygui
 
 APP_VERSION = "1.0.0"
 
-# TODO: make dynamic
-data_files =  {
-    '': ['plugins/send/*.*', 'plugins/test/*.*', 'assets/*.*']
-}    
-
 required_packages = [
     'appdirs',
     'counterparty-cli'
@@ -43,15 +38,8 @@ setup_options = {
     'download_url': 'https://github.com/CounterpartyXCP/counterparty-gui/releases/tag/v' + counterpartygui.APP_VERSION,
     'provides': ['counterpartygui'],
     'packages': find_packages(),
-    'include_package_data': True,
-    'package_data': data_files,
     'zip_safe': False,
-    'install_requires': required_packages,
-    'entry_points': {
-        'gui_scripts': [
-            'counterparty-gui = counterpartygui.core.gui:main'
-        ]
-    }
+    'install_requires': required_packages
 }
 
 setup(**setup_options)
