@@ -9,9 +9,10 @@ from PyQt5.QtCore import QObject
 from PyQt5.QtCore import Qt
 from PyQt5.QtCore import QVariant
 from PyQt5.QtCore import pyqtSlot
-from PyQt5.QtWidgets import QMessageBox, QWidget
+from PyQt5.QtWidgets import QMessageBox, QWidget, QDialog, QVBoxLayout, QLabel, QLineEdit, QPushButton
 from PyQt5.QtQml import QJSValue
 from counterpartycli import clientapi
+from counterpartycli.wallet import LockedWalletError
 
 class DecimalEncoder(json.JSONEncoder):
     def default(self, obj):
@@ -29,6 +30,30 @@ class CounterpartydRPCError(Exception):
         msgBox.setModal(True)
         msgBox.show()
         raise Exception(message)
+
+class AskPassphrase(QDialog):
+    def __init__(self, parent=None, message='Enter your wallet passhrase:'):
+        super().__init__(parent) 
+
+        self.message = message
+        self.setModal(True)
+        self.layout = QVBoxLayout()
+        self.setLayout(self.layout)
+
+        passwordLabel = QLabel(message)
+        self.layout.addWidget(passwordLabel)
+        self.passwordTextField = QLineEdit()
+        self.passwordTextField.setEchoMode(QLineEdit.Password)
+        self.layout.addWidget(self.passwordTextField)
+
+        def onOkPushed():
+            self.close()
+
+        okBtn = QPushButton("Ok")
+        okBtn.clicked.connect(onOkPushed)
+        self.layout.addWidget(okBtn)
+
+        self.exec()
 
 class CounterpartydAPI(QObject):
     def __init__(self, config):
@@ -57,6 +82,13 @@ class CounterpartydAPI(QObject):
 
         try:
             result = clientapi.call(query['method'], query['params'])
+        except LockedWalletError as e:
+            askPass = AskPassphrase()
+            try:
+                clientapi.call('unlock', {'passphrase': askPass.passwordTextField.text()})
+                return self.call(query)
+            except Exception as e:
+                raise CounterpartydRPCError(str(e))
         except Exception as e:
             raise CounterpartydRPCError(str(e))
         
