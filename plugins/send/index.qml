@@ -6,6 +6,7 @@ Rectangle {
     anchors.fill: parent
     property variant menu
     property variant currentAsset
+    property variant currentAssetInfo
 
     // init callback
     function init() {
@@ -34,6 +35,14 @@ Rectangle {
         root.menu = menu
     }
 
+    function displayAmount(amount, divisible) {
+        if (divisible) {
+            return parseFloat(amount.toString());
+        } else {
+            return parseFloat(amount.toString()).toFixed(0);
+        }
+    }
+
     // onMenuAction callback. Called
     function onMenuAction(itemValue) {
         // empty the transactions List
@@ -44,9 +53,10 @@ Rectangle {
 
         // get balance by address and sends list for the current asset
         var assetInfo = xcpApi.call({'method': 'asset', 'params': {'asset_name': root.currentAsset}});
+        root.currentAssetInfo = assetInfo;
 
         // display the balance
-        assetBalanceComp.text = '<b>' + root.currentAsset + '</b><br />' + assetInfo['balance'];
+        assetBalanceComp.text = '<b>' + root.currentAsset + '</b><br />' + displayAmount(assetInfo['balance'], assetInfo['divisible']);
 
         // update text of the send button
         sendFormComp.buttonText = 'Send ' + root.currentAsset;
@@ -55,7 +65,7 @@ Rectangle {
         var sources = [];
         for (var address in assetInfo['addresses']) {
             var label = address;
-            label += ' [' + assetInfo['addresses'][address] + ']';
+            label += ' [' + displayAmount(assetInfo['addresses'][address], assetInfo['divisible']) + ']';
             sources.push(label);
         }
         sendFormComp.sources = sources;
@@ -65,7 +75,7 @@ Rectangle {
             var tx = assetInfo['sends'][t]
             sendsListComp.listModel.append({
                 type: tx['type'],
-                value: tx['quantity'],
+                value: displayAmount(tx['quantity']),
                 from: tx['source'],
                 to: tx['destination'],
                 block_index: tx['block_index']
@@ -75,19 +85,30 @@ Rectangle {
 
     function sendAsset() {
         // prepare RPC call params
+        var quantity = 0;
+        var dispQuantity = 0;
+        if (root.currentAssetInfo['divisible']) {
+            quantity = parseInt((parseFloat(sendFormComp.quantity) * 100000000).toFixed(0));
+            dispQuantity = quantity / 100000000;
+
+        } else {
+            quantity = parseInt(sendFormComp.quantity);
+            dispQuantity = quantity;
+        }
+
         var query = {
             'method': 'create_send',
             'params': {
                 'source':  sendFormComp.source.split(" ").shift(),
                 'destination': sendFormComp.destination,
                 'asset': root.currentAsset,
-                'quantity': parseInt((parseFloat(sendFormComp.quantity) * 100000000).toFixed(0))
+                'quantity': quantity
             }
         }
 
         // prepare confirmation message
         var confirmMessage = "Do you really want to send " +
-                             sendFormComp.quantity + " " + root.currentAsset +
+                             dispQuantity + " " + root.currentAsset +
                              " to " + sendFormComp.destination;
 
         if (GUI.confirm("Confirm send", confirmMessage)) {
