@@ -31,8 +31,8 @@ class CounterpartydRPCError(Exception):
         msgBox.show()
         raise Exception(message)
 
-class AskPassphrase(QDialog):
-    def __init__(self, parent=None, message='Enter your wallet passhrase:'):
+class InputDialog(QDialog):
+    def __init__(self, message, is_password=False, parent=None):
         super().__init__(parent) 
 
         self.message = message
@@ -40,11 +40,12 @@ class AskPassphrase(QDialog):
         self.layout = QVBoxLayout()
         self.setLayout(self.layout)
 
-        passwordLabel = QLabel(message)
-        self.layout.addWidget(passwordLabel)
-        self.passwordTextField = QLineEdit()
-        self.passwordTextField.setEchoMode(QLineEdit.Password)
-        self.layout.addWidget(self.passwordTextField)
+        label = QLabel(message)
+        self.layout.addWidget(label)
+        self.input = QLineEdit()
+        if is_password:
+            self.input.setEchoMode(QLineEdit.Password)
+        self.layout.addWidget(self.input)
 
         def onOkPushed():
             self.close()
@@ -54,6 +55,14 @@ class AskPassphrase(QDialog):
         self.layout.addWidget(okBtn)
 
         self.exec()
+
+    def value(self):
+        return self.input.text()
+
+    @staticmethod
+    def input(message, is_password=False):
+        askValue = InputDialog(message, is_password=is_password)
+        return askValue.value()
 
 class CounterpartydAPI(QObject):
     def __init__(self, config):
@@ -81,11 +90,11 @@ class CounterpartydAPI(QObject):
             pass
 
         try:
-            result = clientapi.call(query['method'], query['params'])
+            result = clientapi.call(query['method'], query['params'], input_method=InputDialog.input)
         except LockedWalletError as e:
-            askPass = AskPassphrase()
+            passphrase = InputDialog.input(message='Enter your wallet passhrase:', is_password=True)
             try:
-                clientapi.call('unlock', {'passphrase': askPass.passwordTextField.text()})
+                clientapi.call('unlock', {'passphrase': passphrase})
                 return self.call(query)
             except Exception as e:
                 raise CounterpartydRPCError(str(e))
