@@ -38,6 +38,7 @@ GroupBox {
             anchors.right: parent.right
             anchors.left: sourceListLabel.right
             anchors.leftMargin: 10
+            implicitWidth: 400
         }
 
         Text {
@@ -48,7 +49,7 @@ GroupBox {
             id: txTo
             style: TextFieldStyle {
                 background: Rectangle {
-                    implicitWidth: 200
+                    implicitWidth: 400
                     border.color: "#cccccc"
                     border.width: 1
                 }
