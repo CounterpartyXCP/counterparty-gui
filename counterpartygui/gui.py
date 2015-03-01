@@ -203,7 +203,8 @@ class GUI(QMainWindow):
         
 def main():
     app = QApplication(sys.argv)
-
+    app.setWindowIcon(QtGui.QIcon('assets/counterpartygui.png'))
+    
     # load global translation
     translator = QtCore.QTranslator()
     fileName = 'counterpartygui_'.format(QtCore.QLocale.system().name())
