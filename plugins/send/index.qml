@@ -35,12 +35,8 @@ Rectangle {
         root.menu = menu
     }
 
-    function displayAmount(amount, divisible) {
-        if (divisible) {
-            return parseFloat(amount.toString());
-        } else {
-            return parseFloat(amount.toString()).toFixed(0);
-        }
+    function displayAmount(amount) {
+        return parseFloat(amount.toString());
     }
 
     // onMenuAction callback. Called
@@ -57,7 +53,7 @@ Rectangle {
         root.currentAssetInfo = assetInfo;
 
         // display the balance
-        assetBalanceComp.text = '<b>' + root.currentAsset + '</b><br />' + displayAmount(assetInfo['balance'], assetInfo['divisible']);
+        assetBalanceComp.text = '<b>' + root.currentAsset + '</b><br />' + displayAmount(assetInfo['balance']);
 
         // update text of the send button
         sendFormComp.buttonText = qsTr('Send %1').arg(root.currentAsset);
@@ -66,7 +62,7 @@ Rectangle {
         var sources = [];
         for (var address in assetInfo['addresses']) {
             var label = address;
-            label += ' [' + displayAmount(assetInfo['addresses'][address], assetInfo['divisible']) + ']';
+            label += ' [' + displayAmount(assetInfo['addresses'][address]) + ']';
             sources.push(label);
         }
         sendFormComp.sources = sources;
@@ -78,7 +74,7 @@ Rectangle {
                 var tx = assetInfo['sends'][t]
                 sendsListComp.listModel.append({
                     type: tx['type'],
-                    value: displayAmount(tx['quantity'], assetInfo['divisible']),
+                    value: displayAmount(tx['quantity']),
                     from: tx['source'],
                     to: tx['destination'],
                     block_index: tx['block_index']
@@ -87,6 +83,13 @@ Rectangle {
         } else {
             sendsListComp.visible = false;
             noTxListForBTC.visible = true;
+        }
+    }
+
+    function onMessage(messageName, messageData) {
+        if (messageName == 'new_block') {
+            onMenuAction(root.currentAsset);
+            init();
         }
     }
 

@@ -22,6 +22,10 @@ from counterpartygui import tr
 APP_NAME = 'counterparty-gui'
 APP_VERSION = '1.0.0'
 
+CONFIG_ARGS = client.CONFIG_ARGS + [
+    [('--poll-interval',), {'type': int, 'default': 60000, 'help': 'poll interval, in miliseconds (default: 60000)'}]
+]
+
 class Config():
     def __init__(self, splash=None):
         self.PLUGINS = ['send', 'test']
@@ -56,7 +60,7 @@ class Config():
             if is_splash_visible:
                 self.splash.show()
 
-        parser = add_config_arguments(parser, client.CONFIG_ARGS, 'client.conf', config_file_arg_name='client_config_file')
+        parser = add_config_arguments(parser, CONFIG_ARGS, 'client.conf', config_file_arg_name='client_config_file')
 
         self.args = parser.parse_args()
 

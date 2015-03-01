@@ -28,8 +28,11 @@ from PyQt5 import QtWidgets, QtCore, QtGui
 from counterpartygui.api import CounterpartydAPI
 from counterpartygui.config import Config
 from counterpartycli.clientapi import ConfigurationError
+from counterpartylib.lib import log
 
 from counterpartygui import tr
+
+logger = logging.getLogger(__name__)
 
 CURR_DIR = os.path.dirname(os.path.realpath(os.path.join(os.getcwd(), os.path.expanduser(__file__))))
 
@@ -64,6 +67,8 @@ class GUI(QMainWindow):
         self.config = config
         self.app = app
 
+        log.set_up(logger, verbose=config.VERBOSE)
+
         self.resize(1024, 680)
         self.setWindowTitle(tr("Counterparty GUI"))
         icon = QtGui.QIcon('assets/counterparty.icns')
@@ -81,9 +86,16 @@ class GUI(QMainWindow):
         fileMenu = mainMenuBar.addMenu(tr("Counterparty GUI"))
         fileMenu.addAction(newAct)
         self.setMenuBar(mainMenuBar)
-        
+
+        self.currentBlock = None        
         self.refreshStatus()
         self.loadPlugins()
+
+        timer = QtCore.QTimer(self);
+        timer.timeout.connect(self.refreshStatus)
+        timer.start(self.config.POLL_INTERVAL)
+
+        self.show()
 
     # init clientapi
     def initXcpApi(self):
@@ -106,31 +118,35 @@ class GUI(QMainWindow):
             return
 
         serverInfo = self.xcpApi.call({'method': 'get_running_info', 'params':[]}, return_dict=True)
+        counterpartyLastBlock = serverInfo['last_block']['block_index']
         walletLastBlock = self.xcpApi.call({'method': 'wallet_last_block', 'params':{}}, return_dict=True)
 
-        message = "Server Last Block: {} ({}) | Server Version: {} | Wallet Last Block: {}"
+        message = 'Server Last Block: {} ({}) | Server Version: {} | Wallet Last Block: {}'
         version = '{}.{}.{}'.format(serverInfo['version_major'], serverInfo['version_minor'], serverInfo['version_revision'])
 
-        self.statusBar().showMessage(message.format(serverInfo['last_block']['block_index'], serverInfo['bitcoin_block_count'], version, walletLastBlock))
+        self.statusBar().showMessage(message.format(counterpartyLastBlock, serverInfo['bitcoin_block_count'], version, walletLastBlock))
 
-    def loadPlugins(self):
-        if not self.initXcpApi():
-            return
+        #if self.currentBlock is not None and self.currentBlock != counterpartyLastBlock:
+        self.notifyPlugins('new_block', {'block_index': counterpartyLastBlock})
 
-        # init toolbar
-        if hasattr(self, 'toolbar'):
-            self.removeToolBar(self.toolbar)
-            del(self.toolbar)
-            
-        self.toolbar = QToolBar()
-        self.toolbar.setAutoFillBackground(True);
-        self.toolbar.setObjectName('menu')
-        self.toolbar.setMovable(False)
-        self.toolbar.setFloatable(False)
-        self.toolbar.setToolButtonStyle(Qt.ToolButtonTextBesideIcon|Qt.AlignLeft)
-        self.addToolBar(Qt.LeftToolBarArea, self.toolbar)
-        self.currentMenuItem = None
+        self.currentBlock = counterpartyLastBlock
 
+    def notifyPlugins(self, messageName, messageData):
+        logger.debug('Notify plugins `{}`: {}'.format(messageName, messageData))
+        if hasattr(self, 'plugins'):
+            for plugin in self.plugins:
+                if hasattr(plugin, 'onMessage'):
+                    plugin.onMessage(messageName, messageData)
+            self.refreshToolbar()
+
+    def refreshToolbar(self):
+        pluginIndex = self.currentMenuItem.property('pluginIndex')
+        actionValue = self.currentMenuItem.property('actionValue')
+        self.initToolbar(selectedPluginIndex=pluginIndex, selectedActionValue=actionValue)
+        self.currentMenuItem.setProperty('active', 'true')
+        self.refreshStyleSheet()
+
+    def initPlugins(self):
         # init QML plugin container
         if hasattr(self, 'stackedWidget'):
             del(self.stackedWidget)
@@ -138,7 +154,6 @@ class GUI(QMainWindow):
         self.stackedWidget = QStackedWidget(self)
         self.plugins = []
 
-        actionIndex = 0
         for pluginName in self.config.PLUGINS:
             view = QQuickView();
             view.setFlags(Qt.SubWindow)
@@ -163,12 +178,32 @@ class GUI(QMainWindow):
             view.setSource(QUrl(plugin_index_path))
             
             plugin = view.rootObject()
-            pluginIndex = len(self.plugins)
             self.plugins.append(plugin)
 
             # call plugin init callback
             plugin.init()
 
+            # add the plugin in the container
+            container = QWidget.createWindowContainer(view, self)
+            self.stackedWidget.addWidget(container)
+
+    def initToolbar(self, selectedPluginIndex=None, selectedActionValue=None):
+        # init toolbar
+        if hasattr(self, 'toolbar'):
+            self.removeToolBar(self.toolbar)
+            del(self.toolbar)
+            
+        self.toolbar = QToolBar()
+        self.toolbar.setAutoFillBackground(True);
+        self.toolbar.setObjectName('menu')
+        self.toolbar.setMovable(False)
+        self.toolbar.setFloatable(False)
+        self.toolbar.setToolButtonStyle(Qt.ToolButtonTextBesideIcon|Qt.AlignLeft)
+        self.addToolBar(Qt.LeftToolBarArea, self.toolbar)
+        self.currentMenuItem = None
+
+        pluginIndex = 0
+        for plugin in self.plugins:
             # generate the left menu
             menu = plugin.property('menu')
             if isinstance(menu, QJSValue):
@@ -188,19 +223,23 @@ class GUI(QMainWindow):
                         items[-1].setProperty('actionValue', menuItem['value'])
                         items[-1].setProperty('isAction', 'true') 
                         self.toolbar.addWidget(items[-1])
-                        if self.currentMenuItem is None:
+                        if self.currentMenuItem is None or (selectedPluginIndex == pluginIndex and selectedActionValue == menuItem['value']):
                             self.currentMenuItem = items[-1]
 
-            # add the plugin in the container
-            container = QWidget.createWindowContainer(view, self)
-            self.stackedWidget.addWidget(container)
+            pluginIndex += 1
+
+        self.currentMenuItem.activate()
+
+    def loadPlugins(self):
+        if not self.initXcpApi():
+            return
+
+        self.initPlugins()
+        self.initToolbar()
 
         # display the plugin container
-        self.currentMenuItem.activate()
         self.refreshStyleSheet()
         self.setCentralWidget(self.stackedWidget)
-        
-        self.show()
 
     def refreshStyleSheet(self):
         self.setStyleSheet('''

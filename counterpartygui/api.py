@@ -14,6 +14,9 @@ from PyQt5.QtQml import QJSValue
 from counterpartycli import clientapi
 from counterpartycli.wallet import LockedWalletError
 from counterpartygui import tr
+from counterpartylib.lib import log
+
+logger = logging.getLogger(__name__)
 
 class DecimalEncoder(json.JSONEncoder):
     def default(self, obj):
@@ -80,13 +83,14 @@ class CounterpartydAPI(QObject):
                             wallet_user=config.WALLET_USER, wallet_password=config.WALLET_PASSWORD,
                             wallet_ssl=config.WALLET_SSL, wallet_ssl_verify=config.WALLET_SSL_VERIFY,
                             requests_timeout=config.REQUESTS_TIMEOUT)
+        log.set_up(logger, verbose=config.VERBOSE)
 
     @pyqtSlot(QVariant, result=QVariant)
     def call(self, query, return_dict=False):
         if isinstance(query, QJSValue):
             query = query.toVariant()
         # TODO: hack, find a real solution
-        print(query)
+        logger.debug(query)
         try:
             for key in query['params']:
                 if key in ['quantity']:
@@ -110,7 +114,7 @@ class CounterpartydAPI(QObject):
         result = json.dumps(result, cls=DecimalEncoder)
         result = json.loads(result)
 
-        print(result)
+        logger.debug(result)
         if return_dict:
             return result
         return QVariant(result)

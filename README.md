@@ -43,7 +43,12 @@ A plugin is defined by the following conventions:
 
 * it must live in the folder `plugins/{PLUGIN_NAME}/`
 * PLUGIN_NAME folder must contains at least one file `index.qml` that contains the QML root object
-* the root object in `index.qml` must contains two javascript callbacks: `init()` and `onMenuAction(itemValue)`. The former is called once, when the application initialises plugins. The latter is called when the user clicks on a menu item that belongs to the plugin.
+* the root object in `index.qml` must contains 3 javascript callbacks: 
+    
+    - `init()`, called once, when the application initialises plugins.  
+    - `onMenuAction(itemValue)`, called when the user clicks on a menu item that belongs to the plugin.
+    - `onMessage(messageName, messageData)`, for now called only when a new block is parsed by the Counterparty server with `messageName` equal to `new_block`.
+
 * the root object in `index.qml` must contains a property `root.menu`. It contains the list of items to dsplay in the left menu and can be populated in the `init()` callback. 
 * the QML context contains:
     - an instance of CounterpartydAPI (core/api.py) to make any RPC call to the counterpartyd API or the Wallet with Javascript, 
