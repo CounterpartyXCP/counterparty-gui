@@ -4,6 +4,11 @@ from cx_Freeze import setup, Executable
 
 import counterpartygui
 
+# Check the presence, or update the path for folowing files
+COUNTERPARTYLIB_PATH = 'C:\\counterparty\\counterpartyd\\counterpartylib'
+CERTIFI_PEM_PATH = 'C:\\Python34\\Lib\\site-packages\\certifi-14.05.14-py3.4.egg\\certifi\\cacert.pem'
+QML_LIBS_PATH = 'C:\\Python34\\Lib\\site-packages\\PyQt5\\qml'
+
 # Dependencies are automatically detected, but it might need fine tuning.
 build_exe_options = {
     "excludes": ['counterpartylib'],
@@ -26,22 +31,21 @@ build_exe_options = {
         'Crypto'
     ],
     "zip_includes": [
-        ("C:\\Python34\\Lib\\site-packages\\certifi-14.05.14-py3.4.egg\\certifi\\cacert.pem", "certifi\\cacert.pem")
+        (CERTIFI_PEM_PATH, "certifi\\cacert.pem")
     ],
     "include_files": [
         ("servers.json", "servers.json"),
         ("plugins", "plugins"),
         ("assets", "assets"),
         ("i18n", "i18n"),
-        ("C:\\counterparty\\counterpartyd\\counterpartylib", "counterpartylib")
+        (COUNTERPARTYLIB_PATH, "counterpartylib")
     ],
     "include_msvcr": True
 }
 
 # QML Libraries
-qml_dir = 'C:\\Python34\\Lib\\site-packages\\PyQt5\\qml'
-for lib_dir in os.listdir(qml_dir):
-    src = os.path.join(qml_dir, lib_dir)
+for lib_dir in os.listdir(QML_LIBS_PATH):
+    src = os.path.join(QML_LIBS_PATH, lib_dir)
     build_exe_options['include_files'].append((src, lib_dir))
 
 # Additional DLL
