@@ -13,6 +13,7 @@ from PyQt5.QtWidgets import QMessageBox, QWidget, QDialog, QVBoxLayout, QLabel, 
 from PyQt5.QtQml import QJSValue
 from counterpartycli import clientapi
 from counterpartycli.wallet import LockedWalletError
+from counterpartygui import tr
 
 class DecimalEncoder(json.JSONEncoder):
     def default(self, obj):
@@ -50,7 +51,7 @@ class InputDialog(QDialog):
         def onOkPushed():
             self.close()
 
-        okBtn = QPushButton("Ok")
+        okBtn = QPushButton(tr("Ok"))
         okBtn.clicked.connect(onOkPushed)
         self.layout.addWidget(okBtn)
 
@@ -92,7 +93,7 @@ class CounterpartydAPI(QObject):
         try:
             result = clientapi.call(query['method'], query['params'], input_method=InputDialog.input)
         except LockedWalletError as e:
-            passphrase = InputDialog.input(message='Enter your wallet passhrase:', is_password=True)
+            passphrase = InputDialog.input(message=tr('Enter your wallet passhrase:'), is_password=True)
             try:
                 clientapi.call('unlock', {'passphrase': passphrase})
                 return self.call(query)

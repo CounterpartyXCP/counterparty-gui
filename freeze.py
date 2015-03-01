@@ -32,6 +32,7 @@ build_exe_options = {
         ("servers.json", "servers.json"),
         ("plugins", "plugins"),
         ("assets", "assets"),
+        ("i18n", "i18n"),
         ("C:\\counterparty\\counterpartyd\\counterpartylib", "counterpartylib")
     ],
     "include_msvcr": True

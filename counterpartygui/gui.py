@@ -28,6 +28,8 @@ from counterpartygui.api import CounterpartydAPI
 from counterpartygui.config import Config
 from counterpartycli.clientapi import ConfigurationError
 
+from counterpartygui import tr
+
 CURR_DIR = os.path.dirname(os.path.realpath(os.path.join(os.getcwd(), os.path.expanduser(__file__))))
 
 class MenuItem(QLabel):
@@ -62,7 +64,7 @@ class GUI(QMainWindow):
         self.app = app
 
         self.resize(1024, 680)
-        self.setWindowTitle("Counterparty GUI")
+        self.setWindowTitle(tr("Counterparty GUI"))
 
         def openPreference():
             self.config.initialize(openDialog=True)
@@ -70,9 +72,9 @@ class GUI(QMainWindow):
 
         # Add Preferences menu 
         mainMenuBar = QMenuBar()
-        newAct = QAction("Preferences...", self)
+        newAct = QAction(tr("Preferences..."), self)
         newAct.triggered.connect(openPreference)
-        fileMenu = mainMenuBar.addMenu("Counterparty GUI")
+        fileMenu = mainMenuBar.addMenu(tr("Counterparty GUI"))
         fileMenu.addAction(newAct)
         self.setMenuBar(mainMenuBar)
 
@@ -122,6 +124,7 @@ class GUI(QMainWindow):
             context.setContextProperty('xcpApi', self.xcpApi)
             context.setContextProperty('GUI', self)
 
+            # load plugin translations if i18n subfolder exists
             i18nDir = 'plugins/{}/i18n'.format(pluginName)
             if os.path.exists(i18nDir):
                 translator = QtCore.QTranslator()
@@ -201,11 +204,18 @@ class GUI(QMainWindow):
 def main():
     app = QApplication(sys.argv)
 
+    # load global translation
+    translator = QtCore.QTranslator()
+    fileName = 'counterpartygui_'.format(QtCore.QLocale.system().name())
+    #fileName = 'counterpartygui_fr'
+    translator.load(fileName, 'i18n')
+    app.installTranslator(translator)
+
     splash_pix = QtGui.QPixmap('assets/splash.png')
     splash = QtWidgets.QSplashScreen(splash_pix, Qt.WindowStaysOnTopHint)
     splash.setMask(splash_pix.mask())
     splash.show()
-    splash.showMessage("Loading wallet...", Qt.AlignBottom | Qt.AlignHCenter);
+    splash.showMessage(tr("Loading wallet..."), Qt.AlignBottom | Qt.AlignHCenter);
 
     app.processEvents()
 

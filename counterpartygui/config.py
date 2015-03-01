@@ -17,10 +17,12 @@ from counterpartycli import client, server
 from counterpartycli.util import add_config_arguments
 from counterpartycli.setup import generate_config_files, generate_config_file
 
+from counterpartygui import tr
+
 APP_NAME = 'counterparty-gui'
 APP_VERSION = '1.0.0'
 
-class Config:
+class Config():
     def __init__(self, splash=None):
         self.PLUGINS = ['send', 'test']
         self.splash = splash
@@ -35,10 +37,10 @@ class Config:
             generate_config_file(configfile, client.CONFIG_ARGS)
 
         # Parse command-line arguments.
-        parser = argparse.ArgumentParser(prog=APP_NAME, description='Counterparty CLI for counterparty-server', add_help=False, conflict_handler='resolve')
-        parser.add_argument('-h', '--help', dest='help', action='store_true', help='show this help message and exit')
+        parser = argparse.ArgumentParser(prog=APP_NAME, description=tr('Counterparty CLI for counterparty-server'), add_help=False, conflict_handler='resolve')
+        parser.add_argument('-h', '--help', dest='help', action='store_true', help=tr('show this help message and exit'))
         parser.add_argument('-V', '--version', action='version', version="{} v{}".format(APP_NAME, APP_VERSION))
-        parser.add_argument('--config-file', help='the location of the counterparty-client configuration file')
+        parser.add_argument('--config-file', help=tr('the location of the counterparty-client configuration file'))
 
         self.args = parser.parse_known_args()[0]
 
@@ -76,7 +78,7 @@ class ConfigDialog(QtWidgets.QDialog):
     def __init__(self, configfile, newconfig=False, parent=None):
         super().__init__(parent)  
 
-        logger.debug('Loading configuration file: `{}`'.format(configfile))
+        logger.debug(tr('Loading configuration file: `{}`').format(configfile))
         knownConfig = configparser.ConfigParser()
         with codecs.open(configfile, 'r', encoding='utf8') as fp:
             knownConfig.readfp(fp)
@@ -88,7 +90,7 @@ class ConfigDialog(QtWidgets.QDialog):
 
         self.setMinimumWidth(400)
         self.setModal(True)
-        self.setWindowTitle('Configuration')
+        self.setWindowTitle(tr('Configuration'))
 
         tabs = QtWidgets.QTabWidget()
 
@@ -96,9 +98,9 @@ class ConfigDialog(QtWidgets.QDialog):
         walletConfigWidget = WalletConfigPage(knownConfig)
         advancedConfigWidget = AdvancedConfigPage(knownConfig)
 
-        tabs.addTab(serverConfigWidget, "Counterparty Server")
-        tabs.addTab(walletConfigWidget, "Walet")
-        tabs.addTab(advancedConfigWidget, "Advanced")
+        tabs.addTab(serverConfigWidget, tr("Counterparty Server"))
+        tabs.addTab(walletConfigWidget, tr("Walet"))
+        tabs.addTab(advancedConfigWidget, tr("Advanced"))
 
         tabLayout = QtWidgets.QVBoxLayout()
         tabLayout.addWidget(tabs)
@@ -113,7 +115,7 @@ class ConfigDialog(QtWidgets.QDialog):
             generate_config_file(configfile, client.CONFIG_ARGS, known_config=knownConfig, overwrite=True)
             self.close()
 
-        selectionCompletedBtn = QtWidgets.QPushButton("Ok")
+        selectionCompletedBtn = QtWidgets.QPushButton(tr("Ok"))
         selectionCompletedBtn.clicked.connect(onServersSelected)
         tabLayout.addWidget(selectionCompletedBtn)
 
@@ -143,7 +145,7 @@ class ServerConfigPage(QtWidgets.QWidget):
             self.radioButtonGroup.addButton(radioButton)
             mainLayout.addWidget(radioButton)
 
-        radioButton = QtWidgets.QRadioButton('Private server:')
+        radioButton = QtWidgets.QRadioButton(tr('Private server:'))
         radioButton.setProperty('public', False)
         privateServerGroupBoxDisabled = True
         if not self.radioButtonGroup.checkedButton():
@@ -164,44 +166,44 @@ class ServerConfigPage(QtWidgets.QWidget):
         groupBoxLayout = QtWidgets.QVBoxLayout()
         groupBoxLayout.setAlignment(QtCore.Qt.AlignTop)
 
-        serverLabel = QtWidgets.QLabel('Host')
+        serverLabel = QtWidgets.QLabel(tr('Host'))
         groupBoxLayout.addWidget(serverLabel)
         self.serverTextField = QtWidgets.QLineEdit()
-        self.serverTextField.setToolTip('the hostname or IP of the counterparty JSON-RPC server')
+        self.serverTextField.setToolTip(tr('the hostname or IP of the counterparty JSON-RPC server'))
         self.serverTextField.setText(knownConfig.get('counterparty-rpc-connect', 'localhost'))
         groupBoxLayout.addWidget(self.serverTextField)
 
-        portLabel = QtWidgets.QLabel('Port')
+        portLabel = QtWidgets.QLabel(tr('Port'))
         groupBoxLayout.addWidget(portLabel)
         self.portTextField = QtWidgets.QSpinBox()
         self.portTextField.setRange(1, 65535)
-        self.portTextField.setToolTip('the counterparty JSON-RPC port to connect to')
+        self.portTextField.setToolTip(tr('the counterparty JSON-RPC port to connect to'))
         try:
             self.portTextField.setValue(int(knownConfig.get('counterparty-rpc-port', '4000')))
         except ValueError:
             self.portTextField.setValue(4000)
         groupBoxLayout.addWidget(self.portTextField)
 
-        userLabel = QtWidgets.QLabel('User')
+        userLabel = QtWidgets.QLabel(tr('User'))
         groupBoxLayout.addWidget(userLabel)
         self.userTextField = QtWidgets.QLineEdit()
-        self.userTextField.setToolTip('the username used to communicate with counterparty over JSON-RPC')
+        self.userTextField.setToolTip(tr('the username used to communicate with counterparty over JSON-RPC'))
         self.userTextField.setText(knownConfig.get('counterparty-rpc-user', 'rpc'))
         groupBoxLayout.addWidget(self.userTextField)
 
-        passwordLabel = QtWidgets.QLabel('Password')
+        passwordLabel = QtWidgets.QLabel(tr('Password'))
         groupBoxLayout.addWidget(passwordLabel)
         self.passwordTextField = QtWidgets.QLineEdit()
-        self.passwordTextField.setToolTip('the password used to communicate with counterparty over JSON-RPC')
+        self.passwordTextField.setToolTip(tr('the password used to communicate with counterparty over JSON-RPC'))
         self.passwordTextField.setEchoMode(QtWidgets.QLineEdit.Password)
         self.passwordTextField.setText(knownConfig.get('counterparty-rpc-password', ''))
         groupBoxLayout.addWidget(self.passwordTextField)
 
-        self.useSSLCheckbox = QtWidgets.QCheckBox('Use SSL to connect to counterparty')
+        self.useSSLCheckbox = QtWidgets.QCheckBox(tr('Use SSL to connect to counterparty'))
         self.useSSLCheckbox.setChecked(bool(int(knownConfig.get('counterparty-rpc-ssl', '0'))))
         groupBoxLayout.addWidget(self.useSSLCheckbox)
 
-        self.verifySSLCheckbox = QtWidgets.QCheckBox('Verify SSL certificate of counterparty (disallow use of self‐signed certificates)')
+        self.verifySSLCheckbox = QtWidgets.QCheckBox(tr('Verify SSL certificate of counterparty (disallow use of self-signed certificates)'))
         self.verifySSLCheckbox.setChecked(bool(int(knownConfig.get('counterparty-rpc-ssl-verify', '0'))))
         groupBoxLayout.addWidget(self.verifySSLCheckbox)
 
@@ -234,9 +236,9 @@ class WalletConfigPage(QtWidgets.QWidget):
         super().__init__(parent)
 
         self.wallets = [
-            ('Bitcoin Core', 'bitcoincore'), 
-            ('btcwallet', 'btcwallet'),
-            ('Electrum', 'electrum')
+            (tr('Bitcoin Core'), 'bitcoincore'), 
+            (tr('btcwallet'), 'btcwallet'),
+            (tr('Electrum'), 'electrum')
         ]
 
         mainLayout = QtWidgets.QVBoxLayout()
@@ -256,44 +258,44 @@ class WalletConfigPage(QtWidgets.QWidget):
         groupBoxLayout = QtWidgets.QVBoxLayout()
         groupBoxLayout.setAlignment(QtCore.Qt.AlignTop)
 
-        serverLabel = QtWidgets.QLabel('Host')
+        serverLabel = QtWidgets.QLabel(tr('Host'))
         groupBoxLayout.addWidget(serverLabel)
         self.serverTextField = QtWidgets.QLineEdit()
-        self.serverTextField.setToolTip('the hostname or IP of the wallet server')
+        self.serverTextField.setToolTip(tr('the hostname or IP of the wallet server'))
         self.serverTextField.setText(knownConfig.get('wallet-connect', 'localhost'))
         groupBoxLayout.addWidget(self.serverTextField)
 
-        portLabel = QtWidgets.QLabel('Port')
+        portLabel = QtWidgets.QLabel(tr('Port'))
         groupBoxLayout.addWidget(portLabel)
         self.portTextField = QtWidgets.QSpinBox()
         self.portTextField.setRange(1, 65535)
-        self.portTextField.setToolTip('the wallet port to connect to')
+        self.portTextField.setToolTip(tr('the wallet port to connect to'))
         try:
             self.portTextField.setValue(int(knownConfig.get('wallet-port', '8332')))
         except ValueError:
             self.portTextField.setValue(8332)
         groupBoxLayout.addWidget(self.portTextField)
 
-        userLabel = QtWidgets.QLabel('User')
+        userLabel = QtWidgets.QLabel(tr('User'))
         groupBoxLayout.addWidget(userLabel)
         self.userTextField = QtWidgets.QLineEdit()
-        self.userTextField.setToolTip('the username used to communicate with the wallet')
+        self.userTextField.setToolTip(tr('the username used to communicate with the wallet'))
         self.userTextField.setText(knownConfig.get('wallet-user', 'bitcoinrpc'))
         groupBoxLayout.addWidget(self.userTextField)
 
-        passwordLabel = QtWidgets.QLabel('Password')
+        passwordLabel = QtWidgets.QLabel(tr('Password'))
         groupBoxLayout.addWidget(passwordLabel)
         self.passwordTextField = QtWidgets.QLineEdit()
-        self.passwordTextField.setToolTip('the password used to communicate with the wallet')
+        self.passwordTextField.setToolTip(tr('the password used to communicate with the wallet'))
         self.passwordTextField.setEchoMode(QtWidgets.QLineEdit.Password)
         self.passwordTextField.setText(knownConfig.get('wallet-password', ''))
         groupBoxLayout.addWidget(self.passwordTextField)
 
-        self.useSSLCheckbox = QtWidgets.QCheckBox('Use SSL to connect to wallet')
+        self.useSSLCheckbox = QtWidgets.QCheckBox(tr('Use SSL to connect to wallet'))
         self.useSSLCheckbox.setChecked(bool(int(knownConfig.get('wallet-ssl', '0'))))
         groupBoxLayout.addWidget(self.useSSLCheckbox)
 
-        self.verifySSLCheckbox = QtWidgets.QCheckBox('Verify SSL certificate of wallet (disallow use of self‐signed certificates)')
+        self.verifySSLCheckbox = QtWidgets.QCheckBox(tr('Verify SSL certificate of wallet (disallow use of self-signed certificates)'))
         self.verifySSLCheckbox.setChecked(bool(int(knownConfig.get('wallet-ssl-verify', '0'))))
         groupBoxLayout.addWidget(self.verifySSLCheckbox)
 
@@ -320,21 +322,21 @@ class AdvancedConfigPage(QtWidgets.QWidget):
         mainLayout.setAlignment(QtCore.Qt.AlignTop)
         self.setLayout(mainLayout)
 
-        self.useTestnet = QtWidgets.QCheckBox('Use testnet network')
+        self.useTestnet = QtWidgets.QCheckBox(tr('Use testnet network'))
         self.useTestnet.setChecked(bool(int(knownConfig.get('testnet', '0'))))
         mainLayout.addWidget(self.useTestnet)
 
-        self.allowUnconfirmed = QtWidgets.QCheckBox('Allow the spending of unconfirmed transaction outputs')
+        self.allowUnconfirmed = QtWidgets.QCheckBox(tr('Allow the spending of unconfirmed transaction outputs'))
         self.allowUnconfirmed.setChecked(bool(int(knownConfig.get('unconfirmed', '0'))))
         mainLayout.addWidget(self.allowUnconfirmed)
 
-        encodingLabel = QtWidgets.QLabel('Data encoding method')
+        encodingLabel = QtWidgets.QLabel(tr('Data encoding method'))
         mainLayout.addWidget(encodingLabel)
         self.encoding = QtWidgets.QComboBox()
         self.encoding.addItems(['auto', 'multisig', 'opreturn', 'pubkeyhash'])
         mainLayout.addWidget(self.encoding)
 
-        feePerKbLabel = QtWidgets.QLabel('Fee per kilobyte, in BTC')
+        feePerKbLabel = QtWidgets.QLabel(tr('Fee per kilobyte, in BTC'))
         mainLayout.addWidget(feePerKbLabel)
         self.feePerKbField = QtWidgets.QDoubleSpinBox()
         self.feePerKbField.setDecimals(8)
@@ -346,7 +348,7 @@ class AdvancedConfigPage(QtWidgets.QWidget):
             self.feePerKbField.setValue(config.DEFAULT_FEE_PER_KB / config.UNIT)
         mainLayout.addWidget(self.feePerKbField)
 
-        regularDustSizeLabel = QtWidgets.QLabel('Value for dust Pay‐to‐Pubkey‐Hash outputs, in BTC')
+        regularDustSizeLabel = QtWidgets.QLabel(tr('Value for dust Pay-to-Pubkey-Hash outputs, in BTC'))
         mainLayout.addWidget(regularDustSizeLabel)
         self.regularDustSize = QtWidgets.QDoubleSpinBox()
         self.regularDustSize.setDecimals(8)
@@ -358,7 +360,7 @@ class AdvancedConfigPage(QtWidgets.QWidget):
             self.regularDustSize.setValue(config.DEFAULT_REGULAR_DUST_SIZE / config.UNIT)
         mainLayout.addWidget(self.regularDustSize)
 
-        multisigDustSizeLabel = QtWidgets.QLabel('Value for dust OP_CHECKMULTISIG outputs, in BTC')
+        multisigDustSizeLabel = QtWidgets.QLabel(tr('Value for dust OP_CHECKMULTISIG outputs, in BTC'))
         mainLayout.addWidget(multisigDustSizeLabel)
         self.multisigDustSize = QtWidgets.QDoubleSpinBox()
         self.multisigDustSize.setDecimals(8)
@@ -370,7 +372,7 @@ class AdvancedConfigPage(QtWidgets.QWidget):
             self.multisigDustSize.setValue(config.DEFAULT_MULTISIG_DUST_SIZE / config.UNIT)
         mainLayout.addWidget(self.multisigDustSize)
 
-        opReturnValueLabel = QtWidgets.QLabel('Value for OP_RETURN outputs, in BTC')
+        opReturnValueLabel = QtWidgets.QLabel(tr('Value for OP_RETURN outputs, in BTC'))
         mainLayout.addWidget(opReturnValueLabel)
         self.opReturnValue = QtWidgets.QDoubleSpinBox()
         self.opReturnValue.setDecimals(8)
