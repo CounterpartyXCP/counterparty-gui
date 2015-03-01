@@ -13,7 +13,7 @@ Rectangle {
         // get balances for addresses in the wallet
         var wallet = xcpApi.call({'method': 'wallet', 'params': {}});
         var menu = {
-            'groupLabel': 'Wallet',
+            'groupLabel': qsTr('Wallet'),
             'items': []
         }
         // generate items of the left menu, one item per asset
@@ -59,7 +59,7 @@ Rectangle {
         assetBalanceComp.text = '<b>' + root.currentAsset + '</b><br />' + displayAmount(assetInfo['balance'], assetInfo['divisible']);
 
         // update text of the send button
-        sendFormComp.buttonText = 'Send ' + root.currentAsset;
+        sendFormComp.buttonText = qsTr('Send %1').arg(root.currentAsset);
 
         // populate the list of source addresses
         var sources = [];
@@ -75,7 +75,7 @@ Rectangle {
             var tx = assetInfo['sends'][t]
             sendsListComp.listModel.append({
                 type: tx['type'],
-                value: displayAmount(tx['quantity']),
+                value: displayAmount(tx['quantity'], assetInfo['divisible']),
                 from: tx['source'],
                 to: tx['destination'],
                 block_index: tx['block_index']
@@ -107,11 +107,12 @@ Rectangle {
         }
 
         // prepare confirmation message
-        var confirmMessage = "Do you really want to send " +
-                             dispQuantity + " " + root.currentAsset +
-                             " to " + sendFormComp.destination;
+        var confirmMessage = qsTr("Do you really want to send %1 %2 to %3 ?")
+                                .arg(String(dispQuantity))
+                                .arg(root.currentAsset)
+                                .arg(sendFormComp.destination);
 
-        if (GUI.confirm("Confirm send", confirmMessage)) {
+        if (GUI.confirm(qsTr("Confirm send"), confirmMessage)) {
             // Compose transaction
             var unsigned_hex = xcpApi.call(query);
             if (unsigned_hex) {
@@ -122,7 +123,7 @@ Rectangle {
                     var tx_hash = xcpApi.call({'method': 'send_raw_transaction', 'params': {'tx_hex': signed_hex}});
                     // display transaction hash
                     if (tx_hash) {
-                        GUI.alert("Transaction done", tx_hash);
+                        GUI.alert(qsTr("Transaction done"), tx_hash);
                     }
                 }
             }

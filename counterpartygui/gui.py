@@ -55,10 +55,11 @@ class MenuItem(QLabel):
 
 class GUI(QMainWindow):
 
-    def __init__(self, config):
+    def __init__(self, config, app):
         super().__init__()
 
         self.config = config
+        self.app = app
 
         self.resize(1024, 680)
         self.setWindowTitle("Counterparty GUI")
@@ -118,8 +119,16 @@ class GUI(QMainWindow):
             # add clientapi into the plugin context
             context = view.rootContext()
 
-            context.setContextProperty("xcpApi", self.xcpApi)
-            context.setContextProperty("GUI", self)
+            context.setContextProperty('xcpApi', self.xcpApi)
+            context.setContextProperty('GUI', self)
+
+            i18nDir = 'plugins/{}/i18n'.format(pluginName)
+            if os.path.exists(i18nDir):
+                translator = QtCore.QTranslator()
+                fileName = 'send_'.format(QtCore.QLocale.system().name())
+                #fileName = 'send_fr'
+                translator.load(fileName, i18nDir)
+                self.app.installTranslator(translator)
 
             # load QML file
             plugin_index_path = 'plugins/{}/index.qml'.format(pluginName)
@@ -191,6 +200,7 @@ class GUI(QMainWindow):
         
 def main():
     app = QApplication(sys.argv)
+
     splash_pix = QtGui.QPixmap('assets/splash.png')
     splash = QtWidgets.QSplashScreen(splash_pix, Qt.WindowStaysOnTopHint)
     splash.setMask(splash_pix.mask())
@@ -200,7 +210,7 @@ def main():
     app.processEvents()
 
     config = Config(splash=splash)
-    screen = GUI(config)
+    screen = GUI(config, app)
 
     def quitApp():
         sys.exit()

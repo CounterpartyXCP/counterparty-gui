@@ -30,7 +30,7 @@ GroupBox {
 
         Text {
             id: sourceListLabel
-            text: "Source"
+            text: qsTr("Source")
         }
 
         ComboBox {
@@ -41,7 +41,7 @@ GroupBox {
         }
 
         Text {
-            text: "To"
+            text: qsTr("To")
         }
 
         TextField {
@@ -53,12 +53,12 @@ GroupBox {
                     border.width: 1
                 }
             }
-            placeholderText: "Address"
+            placeholderText: qsTr("Address")
             enabled: true
         }
 
         Text {
-            text: "Amount"
+            text: qsTr("Amount")
         }
 
         TextField {
@@ -77,7 +77,7 @@ GroupBox {
             Layout.columnSpan: 2
             anchors.horizontalCenter: parent.horizontalCenter
             id: sendButton
-            text: "Send"
+            text: qsTr("Send")
             onClicked: {
                 sendAsset();
             }
