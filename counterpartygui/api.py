@@ -82,7 +82,7 @@ class CounterpartydAPI(QObject):
                             requests_timeout=config.REQUESTS_TIMEOUT)
 
     @pyqtSlot(QVariant, result=QVariant)
-    def call(self, query):
+    def call(self, query, return_dict=False):
         if isinstance(query, QJSValue):
             query = query.toVariant()
         # TODO: hack, find a real solution
@@ -111,5 +111,7 @@ class CounterpartydAPI(QObject):
         result = json.loads(result)
 
         print(result)
+        if return_dict:
+            return result
         return QVariant(result)
         

@@ -81,19 +81,40 @@ class GUI(QMainWindow):
         fileMenu = mainMenuBar.addMenu(tr("Counterparty GUI"))
         fileMenu.addAction(newAct)
         self.setMenuBar(mainMenuBar)
-
+        
+        self.refreshStatus()
         self.loadPlugins()
 
+    # init clientapi
+    def initXcpApi(self):
+        if hasattr(self, 'xcpApi') and isinstance(self.xcpApi, CounterpartydAPI):
+            return True
+        else:
+            try:
+                self.xcpApi = CounterpartydAPI(self.config)
+                return True
+            except ConfigurationError as e:
+                self.show()
+                msgBox = QMessageBox(self)
+                msgBox.setText(str(e))
+                msgBox.setModal(True)
+                msgBox.show()
+                return False
+
+    def refreshStatus(self):
+        if not self.initXcpApi():
+            return
+
+        serverInfo = self.xcpApi.call({'method': 'get_running_info', 'params':[]}, return_dict=True)
+        walletLastBlock = self.xcpApi.call({'method': 'wallet_last_block', 'params':{}}, return_dict=True)
+
+        message = "Server Last Block: {} ({}) | Server Version: {} | Wallet Last Block: {}"
+        version = '{}.{}.{}'.format(serverInfo['version_major'], serverInfo['version_minor'], serverInfo['version_revision'])
+
+        self.statusBar().showMessage(message.format(serverInfo['last_block']['block_index'], serverInfo['bitcoin_block_count'], version, walletLastBlock))
+
     def loadPlugins(self):
-        # init clientapi
-        try:
-            self.xcpApi = CounterpartydAPI(self.config)
-        except ConfigurationError as e:
-            self.show()
-            msgBox = QMessageBox(self)
-            msgBox.setText(str(e))
-            msgBox.setModal(True)
-            msgBox.show()
+        if not self.initXcpApi():
             return
 
         # init toolbar
