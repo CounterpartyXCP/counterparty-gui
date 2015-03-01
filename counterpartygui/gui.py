@@ -1,6 +1,7 @@
 import logging
 import json
 import os
+import platform
 import sys
 from decimal import Decimal as D
 
@@ -65,6 +66,9 @@ class GUI(QMainWindow):
 
         self.resize(1024, 680)
         self.setWindowTitle(tr("Counterparty GUI"))
+        icon = QtGui.QIcon('assets/counterparty.icns')
+        self.setWindowIcon(icon)
+        self.app.setWindowIcon(icon)
 
         def openPreference():
             self.config.initialize(openDialog=True)
@@ -203,7 +207,11 @@ class GUI(QMainWindow):
         
 def main():
     app = QApplication(sys.argv)
-    app.setWindowIcon(QtGui.QIcon('assets/counterpartygui.png'))
+
+    if platform.system() == "Windows":
+        import ctypes
+        appid = 'counterparty.counterparty-gui' # arbitrary string
+        ctypes.windll.shell32.SetCurrentProcessExplicitAppUserModelID(appid)
     
     # load global translation
     translator = QtCore.QTranslator()
