@@ -65,6 +65,10 @@ class InputDialog(QDialog):
         askValue = InputDialog(message, is_password=is_password)
         return askValue.value()
 
+def pubkeyResolver(address):
+    message = tr('Public keys (hexadecimal) or Private key (Wallet Import Format) for `{}`: ').format(address)
+    return InputDialog.input(message=message)
+
 class CounterpartydAPI(QObject):
     def __init__(self, config):
         super(CounterpartydAPI, self).__init__()
@@ -91,7 +95,7 @@ class CounterpartydAPI(QObject):
             pass
 
         try:
-            result = clientapi.call(query['method'], query['params'], input_method=InputDialog.input)
+            result = clientapi.call(query['method'], query['params'], pubkey_resolver=pubkeyResolver)
         except LockedWalletError as e:
             passphrase = InputDialog.input(message=tr('Enter your wallet passhrase:'), is_password=True)
             try:
