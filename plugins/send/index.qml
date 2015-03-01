@@ -47,6 +47,7 @@ Rectangle {
     function onMenuAction(itemValue) {
         // empty the transactions List
         sendsListComp.listModel.clear()
+        noTxListForBTC.visible = false;
 
         // set the current assets
         root.currentAsset = itemValue;
@@ -70,16 +71,22 @@ Rectangle {
         }
         sendFormComp.sources = sources;
 
-        // populate the transactions list
-        for (var t in assetInfo['sends']) {
-            var tx = assetInfo['sends'][t]
-            sendsListComp.listModel.append({
-                type: tx['type'],
-                value: displayAmount(tx['quantity'], assetInfo['divisible']),
-                from: tx['source'],
-                to: tx['destination'],
-                block_index: tx['block_index']
-            });
+        if (root.currentAsset != 'BTC') {
+            sendsListComp.visible = true;
+            // populate the transactions list
+            for (var t in assetInfo['sends']) {
+                var tx = assetInfo['sends'][t]
+                sendsListComp.listModel.append({
+                    type: tx['type'],
+                    value: displayAmount(tx['quantity'], assetInfo['divisible']),
+                    from: tx['source'],
+                    to: tx['destination'],
+                    block_index: tx['block_index']
+                });
+            }
+        } else {
+            sendsListComp.visible = false;
+            noTxListForBTC.visible = true;
         }
     }
 
@@ -151,6 +158,15 @@ Rectangle {
         SendsList {
             id: sendsListComp
             anchors.top: sendFormComp.bottom
+        }
+        Text {
+            id: noTxListForBTC
+            text: qsTr("Transaction list not available for BTC")
+            anchors.top: sendFormComp.bottom
+            anchors.horizontalCenter: parent.horizontalCenter
+            anchors.topMargin: 10
+            font.italic: true
+            visible: false
         }
     }
 }

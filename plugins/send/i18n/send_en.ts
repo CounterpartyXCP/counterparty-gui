@@ -65,23 +65,28 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../index.qml" line="62"/>
+        <location filename="../index.qml" line="63"/>
         <source>Send %1</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../index.qml" line="110"/>
+        <location filename="../index.qml" line="117"/>
         <source>Do you really want to send %1 %2 to %3 ?</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../index.qml" line="115"/>
+        <location filename="../index.qml" line="122"/>
         <source>Confirm send</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../index.qml" line="126"/>
+        <location filename="../index.qml" line="133"/>
         <source>Transaction done</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../index.qml" line="164"/>
+        <source>Transaction list not available for BTC</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
