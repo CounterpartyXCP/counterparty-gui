@@ -32,7 +32,7 @@ class CounterpartydRPCError(Exception):
         msgBox = QMessageBox()
         msgBox.setText(message)
         msgBox.setModal(True)
-        msgBox.show()
+        msgBox.exec()
         raise Exception(message)
 
 class InputDialog(QDialog):

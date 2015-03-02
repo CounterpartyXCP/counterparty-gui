@@ -117,19 +117,24 @@ class GUI(QMainWindow):
         if not self.initXcpApi():
             return
 
-        serverInfo = self.xcpApi.call({'method': 'get_running_info', 'params':[]}, return_dict=True)
-        counterpartyLastBlock = serverInfo['last_block']['block_index']
-        walletLastBlock = self.xcpApi.call({'method': 'wallet_last_block', 'params':{}}, return_dict=True)
+        try:
+            serverInfo = self.xcpApi.call({'method': 'get_running_info', 'params':[]}, return_dict=True)
+            counterpartyLastBlock = serverInfo['last_block']['block_index']
+            walletLastBlock = self.xcpApi.call({'method': 'wallet_last_block', 'params':{}}, return_dict=True)
 
-        message = 'Server Last Block: {} ({}) | Server Version: {} | Wallet Last Block: {}'
-        version = '{}.{}.{}'.format(serverInfo['version_major'], serverInfo['version_minor'], serverInfo['version_revision'])
+            message = 'Server Last Block: {} ({}) | Server Version: {} | Wallet Last Block: {}'
+            version = '{}.{}.{}'.format(serverInfo['version_major'], serverInfo['version_minor'], serverInfo['version_revision'])
 
-        self.statusBar().showMessage(message.format(counterpartyLastBlock, serverInfo['bitcoin_block_count'], version, walletLastBlock))
+            self.statusBar().showMessage(message.format(counterpartyLastBlock, serverInfo['bitcoin_block_count'], version, walletLastBlock))
 
-        #if self.currentBlock is not None and self.currentBlock != counterpartyLastBlock:
-        self.notifyPlugins('new_block', {'block_index': counterpartyLastBlock})
+            #if self.currentBlock is not None and self.currentBlock != counterpartyLastBlock:
+            self.notifyPlugins('new_block', {'block_index': counterpartyLastBlock})
 
-        self.currentBlock = counterpartyLastBlock
+            self.currentBlock = counterpartyLastBlock
+        except:
+            # fails silently, error are already shown by `api.CounterpartydRPCError`
+            # and refreshStatus is executed each self.config.POLL_INTERVAL second
+            return
 
     def notifyPlugins(self, messageName, messageData):
         logger.debug('Notify plugins `{}`: {}'.format(messageName, messageData))
