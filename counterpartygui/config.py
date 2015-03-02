@@ -107,7 +107,7 @@ class ConfigDialog(QtWidgets.QDialog):
         advancedConfigWidget = AdvancedConfigPage(knownConfig)
 
         tabs.addTab(serverConfigWidget, tr("Counterparty Server"))
-        tabs.addTab(walletConfigWidget, tr("Walet"))
+        tabs.addTab(walletConfigWidget, tr("Wallet"))
         tabs.addTab(advancedConfigWidget, tr("Advanced"))
 
         tabLayout = QtWidgets.QVBoxLayout()
