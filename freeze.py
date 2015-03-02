@@ -49,7 +49,7 @@ for lib_dir in os.listdir(QML_LIBS_PATH):
     build_exe_options['include_files'].append((src, lib_dir))
 
 # Additional DLL
-for dll in ['d3dcompiler_47.dll', 'libEGL.dll', 'libGLESv2.dll']:
+for dll in ['d3dcompiler_47.dll', 'libEGL.dll', 'libGLESv2.dll', 'msvcr110.dll', 'msvcp110.dll']:
     dll_path = ctypes.util.find_library(dll)
     build_exe_options['include_files'].append((dll_path, dll))
 
