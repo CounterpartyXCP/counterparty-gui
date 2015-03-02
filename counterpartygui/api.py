@@ -83,7 +83,7 @@ class CounterpartydAPI(QObject):
                             wallet_user=config.WALLET_USER, wallet_password=config.WALLET_PASSWORD,
                             wallet_ssl=config.WALLET_SSL, wallet_ssl_verify=config.WALLET_SSL_VERIFY,
                             requests_timeout=config.REQUESTS_TIMEOUT)
-        log.set_up(logger, verbose=config.VERBOSE)
+        log.set_up(logger, verbose=config.VERBOSE, logfile=config.LOG_FILE)
 
     @pyqtSlot(QVariant, result=QVariant)
     def call(self, query, return_dict=False):

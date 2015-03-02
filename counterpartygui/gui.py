@@ -67,7 +67,7 @@ class GUI(QMainWindow):
         self.config = config
         self.app = app
 
-        log.set_up(logger, verbose=config.VERBOSE)
+        log.set_up(logger, verbose=config.VERBOSE, logfile=config.LOG_FILE)
 
         self.resize(1024, 680)
         self.setWindowTitle(tr("Counterparty GUI"))

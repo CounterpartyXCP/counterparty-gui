@@ -75,7 +75,11 @@ class Config():
             sys.exit()
 
         # Logging
-        log.set_up(logger, verbose=self.args.verbose)
+        logdir = appdirs.user_log_dir(appauthor=config.XCP_NAME, appname=config.APP_NAME)
+        if not os.path.exists(logdir):
+            os.makedirs(logdir, mode=0o755)
+        self.LOG_FILE = os.path.join(logdir, 'counterpartygui.log')
+        log.set_up(logger, verbose=self.args.verbose, logfile=self.LOG_FILE)
             
 
 class ConfigDialog(QtWidgets.QDialog):
