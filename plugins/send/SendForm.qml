@@ -31,6 +31,7 @@ GroupBox {
         Text {
             id: sourceListLabel
             text: qsTr("Source")
+            font.pointSize: 14
         }
 
         ComboBox {
@@ -43,6 +44,7 @@ GroupBox {
 
         Text {
             text: qsTr("To")
+            font.pointSize: 14
         }
 
         TextField {
@@ -54,12 +56,14 @@ GroupBox {
                     border.width: 1
                 }
             }
+            font.pointSize: 14
             placeholderText: qsTr("Address")
             enabled: true
         }
 
         Text {
             text: qsTr("Amount")
+            font.pointSize: 14
         }
 
         TextField {
@@ -71,6 +75,7 @@ GroupBox {
                     border.width: 1
                 }
             }
+            font.pointSize: 14
             placeholderText: "0.00"
         }
 
