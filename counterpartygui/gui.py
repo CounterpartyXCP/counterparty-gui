@@ -88,14 +88,14 @@ class GUI(QMainWindow):
         self.setMenuBar(mainMenuBar)
 
         self.currentBlock = None        
-        self.refreshStatus()
-        self.loadPlugins()
+        if self.refreshStatus():
+            self.loadPlugins()
 
-        timer = QtCore.QTimer(self);
-        timer.timeout.connect(self.refreshStatus)
-        timer.start(self.config.POLL_INTERVAL)
+            timer = QtCore.QTimer(self);
+            timer.timeout.connect(self.refreshStatus)
+            timer.start(self.config.POLL_INTERVAL)
 
-        self.show()
+            self.show()
 
     # init clientapi
     def initXcpApi(self):
@@ -115,7 +115,7 @@ class GUI(QMainWindow):
 
     def refreshStatus(self):
         if not self.initXcpApi():
-            return
+            return False
 
         try:
             serverInfo = self.xcpApi.call({'method': 'get_running_info', 'params':[]}, return_dict=True)
@@ -131,10 +131,16 @@ class GUI(QMainWindow):
             self.notifyPlugins('new_block', {'block_index': counterpartyLastBlock})
 
             self.currentBlock = counterpartyLastBlock
+
+            return True
         except:
-            # fails silently, error are already shown by `api.CounterpartydRPCError`
+            # if application startup then open preference dialog and exit
+            if not hasattr(self, 'plugins'):
+                self.config.initialize(openDialog=True)
+                exit()
+            # else fails silently, error are already shown by `api.CounterpartydRPCError`
             # and refreshStatus is executed each self.config.POLL_INTERVAL second
-            return
+            return False
 
     def notifyPlugins(self, messageName, messageData):
         logger.debug('Notify plugins `{}`: {}'.format(messageName, messageData))
