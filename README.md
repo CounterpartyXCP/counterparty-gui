@@ -10,30 +10,23 @@ counterparty-gui
 * [Python 3](http://python.org)
 * [PyQT5](http://www.riverbankcomputing.com/software/pyqt/download5)
 * [`counterparty-cli`](https://github.com/CounterpartyXCP/counterparty-cli)
-* [`Bitcoin Core`](https://bitcoin.org/en/download) (OR [`btcwallet`](https://github.com/btcsuite/btcwallet) OR [`Electrum`](https://electrum.org/download.html))
+* [`Bitcoin Core`](https://bitcoin.org/en/download) OR [`btcwallet`](https://github.com/btcsuite/btcwallet)
 
-# Installation
+# Installation and usage
 
-**Linux and Mac OS X**
+**With installer**
+
+Download and execute Windows (or MacOS installer) [installer](https://github.com/CounterpartyXCP/counterparty-gui/releases).
+
+**From source**
 
 ```
 $ git clone https://github.com/CounterpartyXCP/counterparty-gui.git
 $ cd counterparty-gui
 $ pip3 install -r requirements.txt
 $ python3 setup.py install
+$ ./counterparty-gui.py --help
 ```
-
-**Windows**
-
-Download and execute the MSI [installer](https://github.com/CounterpartyXCP/counterparty-gui/releases).
-
-# Usage
-
-The command‐line syntax of counterparty-gui is that of
-`./counterparty-gui.py {OPTIONS}`.
-
-For a summary of the command‐line options, see
-`./counterparty-gui.py --help`.
 
 # Plugins
 
