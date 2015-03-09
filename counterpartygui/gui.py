@@ -122,10 +122,9 @@ class GUI(QMainWindow):
             counterpartyLastBlock = serverInfo['last_block']['block_index']
             walletLastBlock = self.xcpApi.call({'method': 'wallet_last_block', 'params':{}}, return_dict=True)
 
-            message = 'Server Last Block: {} ({}) | Server Version: {} | Wallet Last Block: {}'
-            version = '{}.{}.{}'.format(serverInfo['version_major'], serverInfo['version_minor'], serverInfo['version_revision'])
+            message = 'Server Last Block: {} | Wallet Last Block: {}'
 
-            self.statusBar().showMessage(message.format(counterpartyLastBlock, serverInfo['bitcoin_block_count'], version, walletLastBlock))
+            self.statusBar().showMessage(message.format(counterpartyLastBlock, walletLastBlock))
 
             #if self.currentBlock is not None and self.currentBlock != counterpartyLastBlock:
             self.notifyPlugins('new_block', {'block_index': counterpartyLastBlock})
