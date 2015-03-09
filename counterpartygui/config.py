@@ -28,7 +28,7 @@ CONFIG_ARGS = client.CONFIG_ARGS + [
 
 class Config():
     def __init__(self, splash=None):
-        self.PLUGINS = ['send', 'test']
+        self.PLUGINS = ['send']
         self.splash = splash
         self.initialize()
 
