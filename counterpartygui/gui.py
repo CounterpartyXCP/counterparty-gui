@@ -254,7 +254,7 @@ class GUI(QMainWindow):
 
     def refreshStyleSheet(self):
         self.setStyleSheet('''
-            QWidget, QQuickView, QToolBar, QMainWindow, QTableView { font-size:14pt }
+            QWidget, QQuickView, QToolBar, QMainWindow { font-size:14pt }
             QToolBar#menu { background-color: #ececec; border: 1px solid #ececec; border-right-color: #000; }
             QToolBar#menu QLabel { width:100%; text-align:left; padding:3px; margin:0; }
             QToolBar#menu QLabel[isAction="true"]:hover { background-color:#CCC; }
