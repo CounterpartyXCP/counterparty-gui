@@ -84,7 +84,7 @@ class Config():
 
 class ConfigDialog(QtWidgets.QDialog):
     def __init__(self, configfile, newconfig=False, parent=None):
-        super().__init__(parent)  
+        super().__init__(parent, QtCore.Qt.WindowSystemMenuHint | QtCore.Qt.WindowTitleHint | QtCore.Qt.WindowCloseButtonHint)  
 
         logger.debug(tr('Loading configuration file: `{}`').format(configfile))
         knownConfig = configparser.ConfigParser()
@@ -245,8 +245,7 @@ class WalletConfigPage(QtWidgets.QWidget):
 
         self.wallets = [
             (tr('Bitcoin Core'), 'bitcoincore'), 
-            (tr('btcwallet'), 'btcwallet'),
-            (tr('Electrum'), 'electrum')
+            (tr('btcwallet'), 'btcwallet')
         ]
 
         mainLayout = QtWidgets.QVBoxLayout()
