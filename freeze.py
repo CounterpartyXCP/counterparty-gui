@@ -1,4 +1,4 @@
-import os, sys
+import os, sys, hashlib, shutil
 import ctypes.util
 from cx_Freeze import setup, Executable
 
@@ -98,3 +98,15 @@ setup_options = {
 }
 
 setup(**setup_options)
+
+if sys.platform == "win32":
+    dist_path = 'dist/counterparty-gui-{}-amd64.msi'.format(counterpartygui.APP_VERSION)
+    new_dist_path = 'dist/counterparty-gui-{}-amd64-{}.msi'
+
+# Open,close, read file and calculate MD5 on its contents  
+with open(dist_path, 'rb') as dist_file:
+    data = dist_file.read()    
+    md5 = hashlib.md5(data).hexdigest()
+# Include the MD5 in the distribution filename
+new_dist_path = new_dist_path.format(counterpartygui.APP_VERSION + '-BETA', md5) # distutils does not support BETA
+shutil.copy(dist_path, new_dist_path) # renaming raises a PermissionError (?)
