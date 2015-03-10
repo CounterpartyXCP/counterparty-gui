@@ -275,6 +275,11 @@ class GUI(QMainWindow):
     @pyqtSlot(QVariant, QVariant)
     def alert(self, title, text):
         QMessageBox.information(self, title, text)
+
+    @pyqtSlot(QVariant)
+    def copyToClipboard(self, text):
+        clipboard = QApplication.clipboard();
+        clipboard.setText(text)
         
 def main():
     app = QApplication(sys.argv)

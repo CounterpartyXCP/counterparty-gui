@@ -34,12 +34,23 @@ GroupBox {
             font.pointSize: 14
         }
 
-        ComboBox {
-            id: sourceList
+        RowLayout {
             anchors.right: parent.right
             anchors.left: sourceListLabel.right
             anchors.leftMargin: 10
-            implicitWidth: 400
+
+            ComboBox {
+                id: sourceList
+                implicitWidth: 400
+            }
+
+            Button {
+                id: copyButton
+                iconSource: "copy.png"
+                onClicked: {
+                    copySourceToClipboard();
+                }
+            }
         }
 
         Text {

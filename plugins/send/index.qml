@@ -140,6 +140,11 @@ Rectangle {
         }
     }
 
+    function copySourceToClipboard() {
+        var selectedSource = sendFormComp.source.split(" ").shift();
+        GUI.copyToClipboard(selectedSource);
+    }
+
     // Screen
     ColumnLayout {
         id: mainLayout
