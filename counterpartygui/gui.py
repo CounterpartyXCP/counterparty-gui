@@ -45,15 +45,23 @@ class MenuItem(QLabel):
     def activate(self):
         pluginIndex = self.property('pluginIndex')
         actionValue = self.property('actionValue')
-        # display the plugin
-        self.parent.stackedWidget.setCurrentIndex(pluginIndex)
-        # call the plugin callback
-        self.parent.plugins[pluginIndex].onMenuAction(actionValue)
+        
         # change style
         if self.parent.currentMenuItem:
             self.parent.currentMenuItem.setProperty('active', 'false')
         self.setProperty('active', 'true')
+        
+        self.parent.refreshStyleSheet()
+        self.parent.app.processEvents()
+        if self.parent.currentMenuItem != self:
+            self.parent.stackedWidget.hide()
         self.parent.currentMenuItem = self
+        # display the plugin
+        self.parent.stackedWidget.setCurrentIndex(pluginIndex)
+        # call the plugin callback
+        self.parent.app.processEvents()
+        self.parent.plugins[pluginIndex].onMenuAction(actionValue)
+        self.parent.stackedWidget.show()
         self.parent.refreshStyleSheet()
 
     def mouseReleaseEvent(self, event):
@@ -127,8 +135,8 @@ class GUI(QMainWindow):
 
             self.statusBar().showMessage(message.format(counterpartyLastBlock, walletLastBlock))
 
-            #if self.currentBlock is not None and self.currentBlock != counterpartyLastBlock:
-            self.notifyPlugins('new_block', {'block_index': counterpartyLastBlock})
+            if self.currentBlock is not None and self.currentBlock != counterpartyLastBlock:
+                self.notifyPlugins('new_block', {'block_index': counterpartyLastBlock})
 
             self.currentBlock = counterpartyLastBlock
 
