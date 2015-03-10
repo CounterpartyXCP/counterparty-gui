@@ -15,6 +15,7 @@ from counterpartycli import clientapi
 from counterpartycli.wallet import LockedWalletError
 from counterpartygui import tr
 from counterpartylib.lib import log
+import counterpartygui
 
 logger = logging.getLogger(__name__)
 
@@ -28,11 +29,16 @@ class DecimalEncoder(json.JSONEncoder):
 # TODO: display message box
 class CounterpartydRPCError(Exception):
     def __init__(self, message):
+        if hasattr(counterpartygui, 'splash'):
+            counterpartygui.splash.hide()
         super().__init__(message)
         msgBox = QMessageBox()
         msgBox.setText(message)
         msgBox.setModal(True)
         msgBox.exec()
+        if hasattr(counterpartygui, 'splash'):
+            counterpartygui.splash.show()
+        # TODO
         raise Exception(message)
 
 class InputDialog(QDialog):
@@ -90,7 +96,7 @@ class CounterpartydAPI(QObject):
         if isinstance(query, QJSValue):
             query = query.toVariant()
         # TODO: hack, find a real solution
-        logger.debug(query)
+        # logger.debug(query)
         try:
             for key in query['params']:
                 if key in ['quantity']:
@@ -114,7 +120,7 @@ class CounterpartydAPI(QObject):
         result = json.dumps(result, cls=DecimalEncoder)
         result = json.loads(result)
 
-        logger.debug(result)
+        #  logger.debug(result)
         if return_dict:
             return result
         return QVariant(result)

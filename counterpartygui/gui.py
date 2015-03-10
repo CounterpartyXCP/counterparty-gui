@@ -25,7 +25,8 @@ from PyQt5.QtQml import QJSValue
 
 from PyQt5 import QtWidgets, QtCore, QtGui
 
-from counterpartygui.api import CounterpartydAPI
+import counterpartygui
+from counterpartygui.api import CounterpartydAPI, CounterpartydRPCError
 from counterpartygui.config import Config
 from counterpartycli.clientapi import ConfigurationError
 from counterpartylib.lib import log
@@ -128,6 +129,7 @@ class GUI(QMainWindow):
 
         try:
             serverInfo = self.xcpApi.call({'method': 'get_running_info', 'params':[]}, return_dict=True)
+
             counterpartyLastBlock = serverInfo['last_block']['block_index']
             walletLastBlock = self.xcpApi.call({'method': 'wallet_last_block', 'params':{}}, return_dict=True)
 
@@ -141,7 +143,8 @@ class GUI(QMainWindow):
             self.currentBlock = counterpartyLastBlock
 
             return True
-        except:
+        # TODO
+        except Exception as e:
             # if application startup then open preference dialog and exit
             if not hasattr(self, 'plugins'):
                 if self.splash:
@@ -312,7 +315,7 @@ def main():
     splash.setMask(splash_pix.mask())
     splash.show()
     splash.showMessage(tr("Loading wallet..."), Qt.AlignBottom | Qt.AlignHCenter);
-
+    setattr(counterpartygui, 'splash', splash)
     app.processEvents()
 
     config = Config(splash=splash)
