@@ -36,8 +36,6 @@ class CounterpartydRPCError(Exception):
         msgBox.setText(message)
         msgBox.setModal(True)
         msgBox.exec()
-        if hasattr(counterpartygui, 'splash'):
-            counterpartygui.splash.show()
         # TODO
         raise Exception(message)
 
