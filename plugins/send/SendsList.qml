@@ -29,7 +29,7 @@ Rectangle {
     TableView {
         id: txTableView
         anchors.fill : parent
-        TableViewColumn{ role: "type" ; title: qsTr("type") ; width: 50 }
+        TableViewColumn{ role: "type" ; title: qsTr("Type") ; width: 50 }
         TableViewColumn{ role: "value" ; title: qsTr("Amount") ; width: 100 ; delegate: alignRightCell }
         TableViewColumn{ role: "from" ; title: qsTr("From") ; width: 280 }
         TableViewColumn{ role: "to" ; title:qsTr("To") ; width: 280 }
