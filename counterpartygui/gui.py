@@ -61,11 +61,12 @@ class MenuItem(QLabel):
 
 class GUI(QMainWindow):
 
-    def __init__(self, config, app):
+    def __init__(self, config, app, splash):
         super().__init__()
 
         self.config = config
         self.app = app
+        self.splash = splash
 
         log.set_up(logger, verbose=config.VERBOSE, logfile=config.LOG_FILE)
 
@@ -135,6 +136,8 @@ class GUI(QMainWindow):
         except:
             # if application startup then open preference dialog and exit
             if not hasattr(self, 'plugins'):
+                if self.splash:
+                    self.splash.hide()
                 self.config.initialize(openDialog=True)
                 exit()
             # else fails silently, error are already shown by `api.CounterpartydRPCError`
@@ -305,7 +308,7 @@ def main():
     app.processEvents()
 
     config = Config(splash=splash)
-    screen = GUI(config, app)
+    screen = GUI(config, app, splash)
 
     def quitApp():
         sys.exit()
