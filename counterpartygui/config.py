@@ -56,9 +56,12 @@ class Config():
                     self.splash.hide()
             configfile = getattr(self.args, 'config_file', None) or configfile
             configUI = ConfigDialog(configfile, newconfig=not config_exists)
-            configUI.exec()
+            result = configUI.exec()
             if is_splash_visible:
                 self.splash.show()
+
+        if openDialog and result == 0:
+            return False
 
         parser = add_config_arguments(parser, CONFIG_ARGS, 'client.conf', config_file_arg_name='client_config_file')
 
@@ -80,6 +83,8 @@ class Config():
             os.makedirs(logdir, mode=0o755)
         self.LOG_FILE = os.path.join(logdir, 'counterpartygui.log')
         log.set_up(logger, verbose=self.args.verbose, logfile=self.LOG_FILE)
+
+        return True
             
 
 class ConfigDialog(QtWidgets.QDialog):
@@ -119,13 +124,23 @@ class ConfigDialog(QtWidgets.QDialog):
             config.update(walletConfigWidget.getWalletConfig())
             config.update(advancedConfigWidget.getAdvancedConfig())
             knownConfig.update(config)
-            print(knownConfig)
             generate_config_file(configfile, client.CONFIG_ARGS, known_config=knownConfig, overwrite=True)
-            self.close()
+            self.accept()
+
+        def onCancel():
+            self.reject()
+
+        btnLayout = QtWidgets.QHBoxLayout()
+
+        cancelBtn = QtWidgets.QPushButton(tr("Cancel"))
+        cancelBtn.clicked.connect(onCancel)
+        btnLayout.addWidget(cancelBtn)
 
         selectionCompletedBtn = QtWidgets.QPushButton(tr("Ok"))
         selectionCompletedBtn.clicked.connect(onServersSelected)
-        tabLayout.addWidget(selectionCompletedBtn)
+        btnLayout.addWidget(selectionCompletedBtn)
+
+        tabLayout.addLayout(btnLayout)
 
         self.setLayout(tabLayout)
 

@@ -76,8 +76,8 @@ class GUI(QMainWindow):
         self.app.setWindowIcon(icon)
 
         def openPreference():
-            self.config.initialize(openDialog=True)
-            self.loadPlugins()
+            if self.config.initialize(openDialog=True):
+                self.loadPlugins()
 
         # Add Preferences menu 
         mainMenuBar = QMenuBar()
