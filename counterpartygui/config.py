@@ -159,7 +159,9 @@ class ServerConfigPage(QtWidgets.QWidget):
         self.radioButtonGroup = QtWidgets.QButtonGroup(self)
         for server in self.public_servers:
             radioButton = QtWidgets.QRadioButton(server['connect'])
-            radioButton.setProperty('ssl', server['ssl'])
+            radioButton.setProperty('ssl', server['ssl'] if 'ssl' in server else False)
+            radioButton.setProperty('user', server['user'] if 'user' in server else '')
+            radioButton.setProperty('password', server['password'] if 'password' in server else '')
             radioButton.setProperty('public', True)
             if newconfig and server['connect'] == self.public_servers[0]['connect']:
                 radioButton.setChecked(True)
@@ -247,8 +249,8 @@ class ServerConfigPage(QtWidgets.QWidget):
         else:
             config['counterparty-rpc-connect'] = selectedServerButton.text()
             config['counterparty-rpc-port'] = ''
-            config['counterparty-rpc-user'] = ''
-            config['counterparty-rpc-password'] = ''
+            config['counterparty-rpc-user'] = selectedServerButton.property('user')
+            config['counterparty-rpc-password'] = selectedServerButton.property('password')
             config['counterparty-rpc-ssl'] = selectedServerButton.property('ssl')
             config['counterparty-rpc-ssl-verify'] = True
         return config
