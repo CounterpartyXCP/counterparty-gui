@@ -63,7 +63,7 @@ class Config():
         if openDialog and result == 0:
             return False
 
-        parser = add_config_arguments(parser, CONFIG_ARGS, 'client.conf', config_file_arg_name='client_config_file')
+        parser = add_config_arguments(parser, CONFIG_ARGS, 'client.conf', config_file_arg_name='config_file')
 
         self.args = parser.parse_args()
 
